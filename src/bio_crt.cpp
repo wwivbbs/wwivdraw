@@ -174,10 +174,12 @@ void ScreenEngine::LoadFont(char* args[])
 	font_data = default_font_data = new Uint8[4096];
 	
 	FILE* fp = fopen(fontFile, "rb");
-  if (fp) {
-    fread(font_data, 4096, 1, fp);
-    fclose(fp);
+  if (!fp) {
+    cerr << "Unable to load FONT file";
+    abort();
   }
+  fread(font_data, 4096, 1, fp);
+  fclose(fp);
 	free(fontFile);	
 }
 	
