@@ -18,10 +18,10 @@
  * 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#include<iostream>
-#include<glob.h>
-#include<cstdio>
-#include<fonts.hpp>
+#include <iostream>
+// #include <glob.h>
+#include <cstdio>
+#include "fonts.h"
 
 #define FONT_FILE "allfont.fnt"
 

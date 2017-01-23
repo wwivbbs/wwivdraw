@@ -1,9 +1,9 @@
 #ifndef SAUCE__HPP
 #define SAUCE__HPP
 
-#include<SDL/SDL.h>
-#include<cstdio>
-#include<string.h>
+#include "sdl/include/SDL.h"
+#include <cstdio>
+#include <string.h>
 
 class Sauce
 {

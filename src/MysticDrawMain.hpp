@@ -1,38 +1,38 @@
 #ifndef MYSTICDRAWMAIN__HPP
 #define MYSTICDRAWMAIN__HPP
 
-#include<ctype.h>
-#include<string.h>
-#include<stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 #include <sys/types.h> 
-#include<fstream>
-#include<iostream>
-#include<algorithm>
-#include<unistd.h>
-#include<string>
-#include<iomanip>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+// #include <unistd.h>
+#include <string>
+#include <iomanip>
 #ifdef HAS_SVGALIB
 #include<vga.h>
 #endif
 
-#include<bio_crt.h>
+#include "bio_crt.h"
 
-#include<ScreenBuffer.hpp>
-#include<command.hpp>
-#include<HelpCommand.hpp>
-#include<ASCIITableCommand.hpp>
-#include<TabulatorCommand.hpp>
-#include<SelectFontCommand.hpp>
-#include<SelectSauceCommand.hpp>
-#include<SelectEffectModeCommand.hpp>
-#include<SelectColorCommand.hpp>
-#include<FontEditorCommand.hpp>
-#include<PaletteEditorCommand.hpp>
-#include<BlockModeCommand.hpp>
-#include<DrawCommand.hpp>
-#include<ViewModeCommand.hpp>
-#include<sauce.hpp>
-#include<fonts.hpp>
+#include "ScreenBuffer.hpp"
+#include "command.hpp"
+#include "HelpCommand.hpp"
+#include "ASCIITableCommand.hpp"
+#include "TabulatorCommand.hpp"
+#include "SelectFontCommand.hpp"
+#include "SelectSauceCommand.hpp"
+#include "SelectEffectModeCommand.hpp"
+#include "SelectColorCommand.hpp"
+#include "FontEditorCommand.hpp"
+#include "PaletteEditorCommand.hpp"
+#include "BlockModeCommand.hpp"
+#include "DrawCommand.hpp"
+#include "ViewModeCommand.hpp"
+#include "sauce.hpp"
+#include "fonts.h"
 
 #define UNDOPage 0
 #define COPYPage 3

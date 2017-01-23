@@ -1,17 +1,16 @@
 #ifndef BIO_CRT__H
 #define BIO_CRT__H
 
-#include<stdarg.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <vector>
+#include <iostream>
+#include <algorithm>
 
-#include<cstdio>
-#include<cstdlib>
-#include<cstring>
-#include<cctype>
-#include<vector>
-#include<iostream>
-#include<algorithm>
-
-#include<SDL/SDL.h>
+#include "sdl/include/SDL.h"
 
 #define LINES 25
 #define COLS  80

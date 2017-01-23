@@ -1,7 +1,7 @@
-#include<string>
-#include<vector>
-#include<dirent.h>
-#include<errno.h>
+#include <string>
+#include <vector>
+//#include <dirent.h>
+#include <errno.h>
 #include"sauce.hpp"
 
 unsigned char LoadAnsi[4096] = {
@@ -224,6 +224,8 @@ struct FileDescriptor
 
 void load()
 {
+  // TODO(rushfan): Fix this *** BROKEN ***
+#if 0
 	vector<FileDescriptor> files;
 	int readnew=1;
 	FILE *fp;
@@ -365,4 +367,5 @@ void load()
 				}
 			}
 	} while (!done);
+#endif
 }

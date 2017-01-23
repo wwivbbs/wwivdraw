@@ -1,8 +1,8 @@
 #ifndef FONTS_HPP
 #define FONTS_HPP
 
-#include<vector>
-#include<iostream>
+#include <vector>
+#include <iostream>
 
 using namespace std;
 

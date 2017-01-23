@@ -1,11 +1,11 @@
 #ifndef SCREENBUFFER_HPP
 #define SCREENBUFFER_HPP
 
-#include<sauce.hpp>
-#include<stack>
-#include<algorithm>
-#include<cctype>
-#include<iostream>
+#include <sauce.hpp>
+#include <stack>
+#include <algorithm>
+#include <cctype>
+#include <iostream>
 
 using namespace std;
 

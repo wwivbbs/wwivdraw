@@ -1,13 +1,13 @@
 /* same license as Mystic Draw*/
-#include<unistd.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include"include/fonts.h"
-#include<ncurses.h>
-#include<string.h>
-#include<bio_crt.h>
-#include<errno.h>
-#include<ctype.h>
+// #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "fonts.h"
+// #include <curses.h>
+#include <string.h>
+#include "bio_crt.h"
+#include <errno.h>
+#include <ctype.h>
 
 void ClearWindow(void) {
    int x,y;

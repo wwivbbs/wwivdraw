@@ -673,9 +673,20 @@ void MysticDrawMain::exitMysticDraw()
 	}   
 }
 
+// precompiled SDL1.2 not happy with msvc 2015.
+// http://stackoverflow.com/questions/30412951
+FILE _iob[] = { *stdin, *stdout, *stderr };
+
+extern "C" FILE * __cdecl __iob_func(void)
+{
+  return _iob;
+}
+
 int main(int argnum,char *args[]) 
 {
 	MysticDrawMain::getInstance().startMysticDraw(argnum, args);
-	cout << "Thank you for using Mystic Draw" << endl;
+
+  
+  cout << "Thank you for using Mystic Draw" << endl;
    return 0;
 }

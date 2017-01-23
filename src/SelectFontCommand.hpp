@@ -1,11 +1,12 @@
 #ifndef SELECTFONTCOMMAND__HPP
 #define SELECTFONTCOMMAND__HPP
 
-#include<math.h>
-#include<bio_crt.h>
-#include<command.hpp>
-#include<fonts.hpp>
-#include<iostream>
+#include <iostream>
+#include <cmath>
+
+#include "bio_crt.h"
+#include "command.hpp"
+#include "fonts.h"
 
 class SelectOutlineCommand : public Command
 {

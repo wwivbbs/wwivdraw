@@ -1,4 +1,4 @@
-#include<bio_crt.h>
+#include "bio_crt.h"
 
 bool        MouseSupport = false;
 ansout_impl ansout;
@@ -174,8 +174,10 @@ void ScreenEngine::LoadFont(char* args[])
 	font_data = default_font_data = new Uint8[4096];
 	
 	FILE* fp = fopen(fontFile, "rb");
-	fread(font_data, 4096, 1, fp);
-	fclose(fp);
+  if (fp) {
+    fread(font_data, 4096, 1, fp);
+    fclose(fp);
+  }
 	free(fontFile);	
 }
 	
@@ -324,7 +326,7 @@ void init_bio_crt()
         exit(1);
     }
     atexit(SDL_Quit); 
-    screen = SDL_SetVideoMode(640, 400, 32, SDL_HWSURFACE | SDL_FULLSCREEN);
+    screen = SDL_SetVideoMode(640, 400, 32, SDL_HWSURFACE);
 	
 	if (screen == NULL) {
         cerr << "Can't set video mode: " << SDL_GetError() << endl;

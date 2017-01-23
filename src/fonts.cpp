@@ -1,4 +1,6 @@
-#include <fonts.hpp>
+#include <algorithm>
+#include <cstdlib>
+#include "fonts.h"
 
 // TheDrawFont members
 TheDrawFont::TheDrawFont()
@@ -102,7 +104,7 @@ FontLibrary FontLibrary::library;
 
 unsigned char FontLibrary::transformOutline(unsigned char ch)
 {
-	currentOutline = min(max(currentOutline, 0), 18);
+	currentOutline = std::min<int>(std::max<int>(currentOutline, 0), 18);
 	if (ch - 64 > 0 && ch - 64 <= 17) {
 		return outlineCharSet[currentOutline][ch - 65];
 	}
