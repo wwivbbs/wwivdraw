@@ -8,12 +8,15 @@
 #include "command.hpp"
 #include "fonts.h"
 
+class MysticDrawMain;
+
 class SelectOutlineCommand : public Command
 {
 		private:
 			void setunderground(int Underg,int b);
 			
 		public:
+      SelectOutlineCommand(MysticDrawMain* win) : Command(win) {}
 			void run();
 };
 
@@ -24,7 +27,8 @@ class SelectFontCommand : public Command
 		void showPreviewCharacter(int fontNumber);
 		
 	public:
-		void run();
+    SelectFontCommand(MysticDrawMain* win) : Command(win) {}
+    void run();
 };
 
 #endif

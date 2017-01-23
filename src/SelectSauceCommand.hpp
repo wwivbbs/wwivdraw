@@ -6,9 +6,12 @@
 #include<sauce.hpp>
 #include<MysticDrawMain.hpp>
 
+class MysticDrawMain;
+
 class SelectSauceCommand : Command
 {
 	public:
+    SelectSauceCommand(MysticDrawMain* win) : Command(win) {}
 		void run();
 };
 

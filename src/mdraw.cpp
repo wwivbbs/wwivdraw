@@ -17,8 +17,11 @@
  * 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
-#include<MysticDrawMain.hpp>
+#include <string>
+#include <vector>
+#include <cerrno>
+#include "sauce.hpp"
+#include <MysticDrawMain.hpp>
 
 using namespace std;
 
@@ -48,11 +51,1249 @@ char* CharSet[12]={
 char EliteTable[256];
 teffekt effect;
 
-#include<miscfunctions.h>
-#include<options.h>
-#include<save.h>
-#include<load.h>
-#include"menue.h"
+
+void CopyScreen(int p1, int p2)
+{
+  // !!! TODO !!!
+  /*
+  int x;
+  for (x=0;x<MAX_LINES;x++)
+  memcpy(Screen[p2][x],Screen[p1][x],160);*/
+}
+
+void SaveScreen() {
+  // !!! TODO !!!
+  /*
+  CopyScreen(ActivePage,UNDOPage);
+  memcpy(&Screen[UNDOPage][0][0],
+  &Screen[ActivePage][0][0],MAX_LINES*160);*/
+}
+
+void about()
+{
+  SDL_Event event;
+  DrawBox(29, 10, 61, 14);
+  ansout << gotoxy(30, 11);
+  CoolWrite("coded 1996 by Mike Krueger     ");
+  ansout << gotoxy(30, 12);
+  CoolWrite("ansis made by Col. Blair^TUSCON");
+  ansout << gotoxy(30, 13);
+  CoolWrite("Version 1.6 (GPL)              ");
+
+  do {
+    screenEngine.showScreen();
+    SDL_Delay(50);
+
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_KEYDOWN:
+        return;
+      }
+    }
+  } while (true);
+}
+
+void ClearScreen()
+{
+  int x;
+  MysticDrawMain::getInstance().ClearMessageLine();
+  ansout << gotoxy(0, LINES - 1);
+  CoolWrite("Clear Screen :");
+  x = chooser(15, 1, "Yes", "No", 0);
+  Undo = false;
+  if (x == 1) {
+    MysticDrawMain::getInstance().getCurrentBuffer()->clear();
+  }
+  SaveScreen();
+}
+
+void global() {
+  int x, ch;
+  MysticDrawMain::getInstance().ClearMessageLine();
+  ansout << gotoxy(0, LINES - 1);
+  CoolWrite("Global :");
+  x = chooser(10, 1, "Fill", "Copy", "Text", "Abort", 0);
+  switch (x) {
+  case 1:
+    MysticDrawMain::getInstance().ClearMessageLine();
+    ansout << gotoxy(0, LINES - 1);
+    CoolWrite("Fill :");
+    x = chooser(8, 1, "Character", "aTribute", "Fore", "Back", "Abort", 0);
+    switch (x) {
+    case 1:
+      ch = MysticDrawMain::getInstance().readCharacter();
+      MysticDrawMain::getInstance().getCurrentBuffer()->fillCharacter(ch);
+      break;
+    case 2:
+      MysticDrawMain::getInstance().getCurrentBuffer()->fillAttribute(Attribute);
+      break;
+    case 3:
+      MysticDrawMain::getInstance().getCurrentBuffer()->fillForeColor(Attribute & 15);
+
+      break;
+    case 4:
+      MysticDrawMain::getInstance().getCurrentBuffer()->fillBackColor(Attribute & 240);
+      break;
+    }
+    break;
+  case 2:
+    MysticDrawMain::getInstance().ClearMessageLine();
+    ansout << gotoxy(0, LINES - 1);
+    CoolWrite("Copy to page :");
+    switch (chooser(15, 1, "1", "2", "Abort", 0)) {
+    case 1:
+      // TODO !!!
+      //CopyScreen(ActivePage,1);
+      break;
+    case 2:
+      // TODO !!!
+      //CopyScreen(ActivePage,2);
+      break;
+    };
+    break;
+  case 3:
+    MysticDrawMain::getInstance().ClearMessageLine();
+    ansout << gotoxy(0, LINES - 1);
+    CoolWrite("Text :");
+    switch (chooser(8, 1, "Left", "Right", "Center", "Elite", "eFfect", "Abort", 0)) {
+    case 1:
+      MysticDrawMain::getInstance().getCurrentBuffer()->leftTrim();
+      break;
+    case 2:
+      MysticDrawMain::getInstance().getCurrentBuffer()->rightTrim();
+      break;
+    case 3:
+      MysticDrawMain::getInstance().getCurrentBuffer()->center();
+      break;
+    case 4:
+      MysticDrawMain::getInstance().getCurrentBuffer()->transformElite();
+      break;
+    case 5:
+      MysticDrawMain::getInstance().getCurrentBuffer()->drawEffect(effect.Effekt, effect.getColorTable());
+      break;
+    }
+  }
+}
+
+void SetPage()
+{
+  MysticDrawMain::getInstance().ClearMessageLine();
+  ansout << gotoxy(0, LINES - 1);
+  CoolWrite("Set Page :");
+  int i = chooser(12, MysticDrawMain::getInstance().getCurrentBufferNumber() + 1, "1", "2", 0);
+  if (i >= 1 && i <= 2) {
+    MysticDrawMain::getInstance().getCurrentBufferNumber() = i - 1;
+  }
+}
+
+void UndoLast() {
+  if (Undo) {
+    MysticDrawMain::getInstance().ClearMessageLine();
+    ansout << gotoxy(0, LINES - 1);
+    CoolWrite("Undo :");
+    // TODO !!!
+    //if (chooser(7, ActivePage, "Yes", "No", 0) == 1)  {
+    //	CopyScreen(UNDOPage,ActivePage);
+    //}
+  }
+}
+
+
+unsigned char oldColor = 7;
+char *AvatarColor(int col) {
+  char *tmp;
+  tmp = (char *)malloc(4);
+  if (col == oldColor) return NULL;
+  sprintf(tmp, "%c", col);
+  oldColor = col;
+  return tmp;
+}
+/*
+char *strupr(char *str) {
+  unsigned int x;
+  for (x = 0; x <= strlen(str); x++)
+    str[x] = toupper(str[x]);
+  return str;
+}
+*/
+
+char *PCBoardColor(int col) {
+  char *a;
+  if (col == oldColor) return NULL;
+  a = (char *)malloc(4);
+  sprintf(a, "@X%02x", col);
+  a = strupr(a);
+  oldColor = col;
+  return a;
+}
+
+char *AnsiColor(unsigned char col) {
+  char *a;
+  if (col == oldColor) return NULL;
+  a = (char *)malloc(30);
+  *a = 0;
+  if ((oldColor >= 128) && (col<128)) {
+    sprintf(a, "[0m");
+    oldColor = 7;
+    if (col == 7) return a;
+  }
+  sprintf(a, "%s[", a);
+  if (((col & 8) != 8)&((oldColor & 8) == 8)) {
+    sprintf(a, "%s0;", a);
+    oldColor = oldColor & 15;
+  }
+  if (((col & 8) == 8)&((oldColor & 8) != 8)) sprintf(a, "%s1;", a);
+
+  if ((col & 128) == 128) {
+    sprintf(a, "%s5", a);
+    if ((col & 15) != (oldColor & 15) || (col & 112) != (oldColor & 112))
+      sprintf(a, "%s;", a);
+  }
+
+  if ((col & 15) != (oldColor & 15))
+    switch (col & 7) {
+    case 0:
+      sprintf(a, "%s30", a);
+      break;
+    case 1:
+      sprintf(a, "%s34", a);
+      break;
+    case 2:
+      sprintf(a, "%s32", a);
+      break;
+    case 3:
+      sprintf(a, "%s36", a);
+      break;
+    case 4:
+      sprintf(a, "%s31", a);
+      break;
+    case 5:
+      sprintf(a, "%s35", a);
+      break;
+    case 6:
+      sprintf(a, "%s33", a);
+      break;
+    case 7:
+      sprintf(a, "%s37", a);
+      break;
+    }
+  if (((col & 15)) != (oldColor & 15) && (col & 112) != (oldColor & 112))
+    sprintf(a, "%s;", a);
+  if ((col & 112) != (oldColor & 112))
+    switch ((col & 112) >> 4) {
+    case 0:
+      sprintf(a, "%s40", a);
+      break;
+    case 1:
+      sprintf(a, "%s44", a);
+      break;
+    case 2:
+      sprintf(a, "%s42", a);
+      break;
+    case 3:
+      sprintf(a, "%s46", a);
+      break;
+    case 4:
+      sprintf(a, "%s41", a);
+      break;
+    case 5:
+      sprintf(a, "%s45", a);
+      break;
+    case 6:
+      sprintf(a, "%s43", a);
+      break;
+    case 7:
+      sprintf(a, "%s47", a);
+      break;
+    }
+  sprintf(a, "%sm", a);
+  oldColor = col;
+  return a;
+}
+
+int SelectSaveMode()
+{
+  MysticDrawMain::getInstance().ClearMessageLine();
+  return chooser(16, 1, "Clearscreen", "Home", "None", 0);
+}
+
+char *EnterName(char *b) {
+  char *a;
+  char *ext;
+  MysticDrawMain::getInstance().ClearMessageLine();
+  ansout << gotoxy(0, LINES - 1);
+  CoolWrite("Enter Filename :");
+  a = "";
+  a = inputfield(a, 60, 16, LINES - 1);
+  if (strlen(a) == 0) a = strdup("NONAME");
+  ext = strchr(a, '.');
+  if (ext == NULL) a = strcat(a, b);
+  return a;
+}
+
+int CharCount(int d, int e, int a, int chr) {
+  int b, c = 0;
+  for (b = d; b <= e; b++)
+    if ((MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(a, b) == chr)&(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) == MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, d))) c++; else break;
+  return c;
+}
+
+int Numberofchars(int a) {
+  int b, c = 0;
+  for (b = 0; b <= 79; b++)
+    if (((MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(a, b) != ' ') & (MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) != 0)
+      ) |
+      ((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) & 112) != 0)) c = b;
+  return c;
+}
+
+void save() {
+  char *Name, *s;
+  FILE *fp;
+  int x, y, z, chnum;
+  oldColor = 0;
+  ansout << gotoxy(0, LINES - 1);
+  x = chooser(0, 1, "aNsi", "aVatar", "Pcboard", "aScii", "Binary", "C", "XBin", "Abort", 0);
+  int lastLine = MysticDrawMain::getInstance().getCurrentBuffer()->getLastNonEmptyLine();
+  switch (x) {
+  case 1: /*ANSI Save*/
+    Name = EnterName(".ans");
+    fp = fopen(Name, "wb");
+    switch (SelectSaveMode()) {
+    case 1:
+      fprintf(fp, "[2J");
+      break;
+    case 2:
+      fprintf(fp, "[1;1H");
+      break;
+    }
+    for (y = 0; y <= lastLine; y++) {
+      /*	if (y>0) if (Numberofchars(y-1)>=79) fprintf(fp,"[A");*/
+      chnum = Numberofchars(y);
+      for (x = 0; x <= chnum; x++) {
+        z = CharCount(x, chnum, y, ' ');
+        if ((z>2)&((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 112) == 0)) {
+          fprintf(fp, "[%dC", z);
+          x += z - 1;
+        }
+        else {
+          if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
+          s = AnsiColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+          if (s != NULL) fprintf(fp, "%s", s);
+          fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+        }
+      }
+      fputc(13, fp);
+      fputc(10, fp);
+    }
+    fprintf(fp, "[0m");
+    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 1;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    }
+    fclose(fp);
+    break;
+  case 2: /*AVATAR Save*/
+    Name = EnterName(".avt");
+    fp = fopen(Name, "wb");
+    switch (SelectSaveMode()) {
+    case 1:
+      fputc('', fp);
+      break;
+    case 2:
+      fprintf(fp, "");
+      break;
+    }
+    for (y = 0; y <= lastLine; y++) {
+      chnum = Numberofchars(y);
+      for (x = 0; x <= chnum; x++) {
+        z = CharCount(x, chnum, y, MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x));
+        s = AvatarColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+        if (s != NULL) fprintf(fp, "%s", s);
+        if ((z>2)&((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 112) == 0)) {
+          fprintf(fp, "%c%c", MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), z);
+          x += z - 1;
+        }
+        else {
+          if (MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) == 0) fputc(0, fp);
+          if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
+          fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+        }
+      }
+      fputc(13, fp);
+      fputc(10, fp);
+    }
+    fprintf(fp, "");
+    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 5;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    }
+    fclose(fp);
+    break;
+  case 3:
+    Name = EnterName(".pcb");
+    fp = fopen(Name, "wb");
+    switch (SelectSaveMode()) {
+    case 1:
+      fprintf(fp, "@CLS@");
+      break;
+    case 2:
+      fprintf(fp, "@HOME@");
+      break;
+    }
+    for (y = 0; y <= lastLine; y++) {
+      for (x = 0; x <= Numberofchars(y); x++) {
+        if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
+        s = PCBoardColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+        if (s != NULL) fprintf(fp, "%s", s);
+        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+      }
+      fputc(13, fp);
+      fputc(10, fp);
+    }
+    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 4;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    }
+    fclose(fp);
+    break;
+  case 4:
+    Name = EnterName(".asc");
+    fp = fopen(Name, "wb");
+    for (y = 0; y <= lastLine; y++) {
+      for (x = 0; x <= Numberofchars(y); x++) {
+        if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
+        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+      }
+      fputc(13, fp);
+      fputc(10, fp);
+    }
+    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 0;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
+      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    }
+    fclose(fp);
+    break;
+  case 5:
+    Name = EnterName(".bin");
+    fp = fopen(Name, "wb");
+    for (y = 0; y <= lastLine; y++) {
+      for (x = 0; x<MysticDrawMain::getInstance().getCurrentBuffer()->getWidth(); x++) {
+        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x), fp);
+      }
+    }
+    fclose(fp);
+    break;
+  case 6:
+    Name = EnterName(" ");
+    fp = fopen(Name, "wb");
+    fprintf(fp, "unsigned char %s[%d]={\n", Name, (lastLine + 1) * 160);
+    for (y = 0; y <= lastLine; y++) {
+      for (x = 0; x<MysticDrawMain::getInstance().getCurrentBuffer()->getWidth(); x++) {
+        fprintf(fp, "%d,%d", MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x),
+          MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+        if (x + 1 <MysticDrawMain::getInstance().getCurrentBuffer()->getWidth()) fputc(',', fp);
+      }
+      if (y<lastLine) fputc(',', fp); else fprintf(fp, "};");
+      fputc(13, fp);
+      fputc(10, fp);
+    }
+    fclose(fp);
+    break;
+  case 7:
+    Name = EnterName(" ");
+    MysticDrawMain::getInstance().getCurrentBuffer()->save(Name, XBinary);
+    break;
+  }
+}
+
+unsigned char LoadAnsi[4096] = {
+  177,42,223,2,32,2,220,8,223,8,223,8,223,8,223,8,223,8,223,8,220,
+  8,32,8,32,8,32,40,220,42,32,42,32,42,32,42,219,2,223,2,32,
+  2,220,8,223,8,223,8,223,8,223,8,223,8,254,8,220,8,223,8,223,
+  8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,223,8,254,8,223,8,223,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,220,8,32,8,32,8,32,8,223,8,220,8,220,8,223,8,223,
+  8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,223,8,223,8,220,8,32,8,32,40,176,42,177,42,254,42,176,
+  42,32,8,219,8,32,8,220,2,219,2,219,2,219,2,219,2,220,2,32,
+  2,219,8,32,8,32,8,32,40,176,42,177,42,32,42,223,2,32,2,219,
+  8,32,8,220,2,219,2,219,2,219,2,220,2,32,2,254,8,220,2,219,
+  2,219,2,219,2,219,2,219,2,219,2,219,2,219,2,219,2,219,2,219,
+  2,219,2,220,2,32,2,219,2,219,2,219,2,219,2,219,2,219,2,219,
+  2,220,2,32,2,219,8,32,8,32,8,32,8,222,8,219,8,32,8,68,
+  15,105,7,83,8,80,8,76,8,65,8,89,8,255,8,70,15,105,7,76,
+  8,69,8,83,8,32,8,219,8,221,8,32,8,32,40,178,42,177,42,176,
+  42,32,8,219,8,32,8,219,2,219,2,219,2,176,42,177,42,219,2,220,
+  2,32,2,219,8,32,8,32,40,177,42,176,42,223,2,32,2,219,8,32,
+  8,220,2,219,2,176,42,177,42,254,2,219,2,220,2,222,2,219,2,219,
+  2,219,2,219,114,176,42,177,42,176,42,219,114,176,42,177,42,219,114,254,
+  2,219,114,219,2,221,2,219,2,219,2,219,2,176,42,177,42,176,42,219,
+  114,219,2,220,2,32,2,219,8,32,8,32,8,222,8,219,7,32,7,87,
+  15,105,7,84,8,72,8,255,8,84,15,72,8,105,7,83,8,255,8,32,
+  8,32,8,32,8,222,8,219,7,221,8,32,8,32,40,176,42,178,42,176,
+  42,32,8,223,8,220,8,222,2,219,2,219,2,177,42,219,114,176,42,219,
+  2,32,2,219,8,32,8,32,40,176,42,223,2,32,2,219,8,32,8,220,
+  2,219,2,176,42,177,42,219,2,177,42,219,114,219,2,220,2,223,2,219,
+  2,219,114,176,42,177,42,219,114,223,2,223,2,219,114,219,114,176,42,219,
+  114,219,2,223,2,220,2,219,2,176,42,177,42,219,2,177,42,219,114,177,
+  42,219,114,219,2,220,2,32,2,254,8,32,8,32,8,254,8,32,8,69,
+  15,88,8,84,8,69,8,78,8,83,8,105,7,79,8,78,8,83,8,32,
+  8,32,8,32,8,32,8,254,8,32,8,32,8,32,40,176,42,178,42,176,
+  42,32,42,32,8,254,8,32,8,219,2,219,2,177,42,177,42,254,2,219,
+  2,32,2,219,8,32,8,32,8,223,2,32,2,219,8,32,8,220,2,219,
+  2,254,2,219,114,219,2,223,2,219,2,177,42,176,42,219,2,220,2,222,
+  2,219,2,176,42,219,114,219,114,32,8,32,8,219,114,219,2,177,42,219,
+  2,221,2,32,2,219,2,219,2,219,114,177,42,219,2,222,2,176,42,177,
+  42,176,42,219,2,219,2,32,2,219,8,32,8,32,8,254,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,219,8,32,8,32,8,32,40,177,42,177,42,176,
+  42,32,8,220,8,223,8,222,2,219,2,176,42,177,42,219,114,176,42,219,
+  2,32,2,254,8,223,8,223,8,223,8,223,8,254,8,32,8,219,2,219,
+  2,219,114,177,42,219,2,220,2,219,2,177,42,176,42,219,114,219,2,222,
+  2,219,2,176,42,177,42,219,114,220,2,220,2,219,2,177,42,219,114,219,
+  2,221,2,219,2,219,2,219,2,219,2,177,42,219,2,32,2,219,2,177,
+  42,219,114,219,114,219,2,221,2,222,8,221,8,32,8,254,8,32,8,91,
+  8,120,15,93,8,32,8,42,7,46,7,65,15,78,7,83,8,32,8,32,
+  8,32,8,32,8,254,8,254,8,32,8,32,8,32,40,176,42,177,42,32,
+  8,220,8,223,8,32,8,219,2,219,2,177,42,219,114,177,42,219,2,220,
+  2,219,2,219,2,219,2,219,2,219,2,219,2,220,2,32,2,223,2,219,
+  2,219,114,176,42,177,42,219,2,177,42,219,114,176,42,219,2,219,2,222,
+  2,219,2,219,114,177,42,219,114,219,2,219,2,219,114,178,42,177,42,219,
+  2,221,2,223,2,219,2,219,2,219,114,178,42,219,2,32,2,32,2,177,
+  42,176,42,219,114,219,2,221,2,222,8,221,8,32,8,250,8,32,8,91,
+  8,120,15,93,8,32,8,42,7,46,7,65,15,86,7,84,8,32,8,32,
+  8,32,8,254,8,254,8,254,8,32,8,32,40,254,42,176,42,178,42,220,
+  8,223,8,32,8,219,2,219,2,176,42,219,114,176,42,176,42,177,42,177,
+  42,176,42,176,42,177,42,177,42,176,42,219,2,219,114,219,2,220,2,223,
+  2,219,2,219,114,176,42,177,42,219,114,254,2,219,2,219,2,32,2,222,
+  2,219,2,176,42,177,42,219,2,32,2,32,2,219,2,177,42,219,114,219,
+  2,221,2,32,2,219,2,219,2,176,42,178,42,177,42,220,2,219,114,176,
+  42,254,2,219,2,219,2,32,2,219,8,32,8,32,8,254,8,32,8,91,
+  8,120,15,93,8,32,8,42,7,46,7,66,15,73,7,78,8,32,8,32,
+  8,254,8,254,8,254,8,32,8,32,40,176,42,176,42,177,42,178,42,219,
+  8,32,8,219,2,219,2,254,2,176,42,177,42,219,114,219,114,219,2,219,
+  2,219,2,219,2,219,2,219,114,32,34,177,42,254,2,219,114,219,2,32,
+  2,219,2,219,114,219,114,176,42,219,114,219,114,219,2,32,2,32,2,219,
+  114,219,114,254,2,219,2,219,2,32,2,32,2,219,2,219,2,254,2,176,
+  42,219,2,32,2,223,2,219,2,219,2,176,42,219,114,254,2,177,42,219,
+  114,219,2,219,2,32,2,220,8,223,8,32,8,32,8,254,8,32,8,91,
+  8,120,15,93,8,32,8,42,7,46,7,80,15,67,7,66,8,32,8,254,
+  8,254,8,223,8,32,8,32,40,177,42,178,42,177,42,178,42,178,42,219,
+  8,32,8,223,2,219,2,219,2,219,2,219,2,223,2,32,2,220,8,220,
+  8,220,8,220,8,220,8,32,8,223,2,219,2,219,2,219,2,223,2,254,
+  8,32,8,223,2,219,2,219,2,219,2,223,2,32,2,254,8,223,2,219,
+  2,219,114,219,114,219,2,223,2,254,8,223,2,219,2,219,2,219,2,219,
+  114,219,114,223,2,32,2,219,2,219,2,219,2,219,2,219,2,219,2,219,
+  2,223,2,32,2,220,8,223,8,32,8,32,8,32,8,219,8,32,8,91,
+  8,32,8,93,8,32,8,42,7,46,7,88,15,88,7,88,8,32,8,254,
+  8,32,8,32,8,32,40,177,42,176,42,177,42,219,42,178,42,219,42,220,
+  2,223,8,220,8,220,8,220,8,220,8,220,8,220,8,223,8,32,8,32,
+  8,32,8,32,8,32,8,223,8,220,8,220,8,220,8,220,8,220,8,223,
+  8,254,8,220,8,220,8,220,8,220,8,220,8,254,8,223,8,220,8,220,
+  8,220,8,220,8,220,8,220,8,223,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,254,8,254,8,220,8,220,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,223,8,32,8,32,8,220,8,220,8,223,8,32,8,223,8,220,
+  8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,223,
+  8,32,8,32,40,176,42,254,42,178,42,219,42,178,42,219,42,254,42,254,
+  8,223,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,220,
+  8,254,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,223,8,223,8,254,8,220,8,254,8,223,8,223,8,223,8,223,
+  8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,223,8,223,8,223,8,91,8,84,7,105,7,84,7,76,7,69,
+  7,93,8,223,8,254,8,220,8,254,8,223,8,223,8,223,8,223,8,223,
+  8,223,8,91,8,80,7,65,7,105,7,78,7,84,7,69,7,82,7,93,
+  8,223,8,254,8,220,8,254,8,223,8,223,8,223,8,223,8,223,8,91,
+  8,71,7,82,7,79,7,85,7,80,7,93,8,223,8,254,8,254,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,219,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,219,8,223,
+  8,254,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,220,8,220,8,254,8,223,8,254,8,220,8,220,8,220,8,220,
+  8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,254,8,220,
+  8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,220,8,254,8,223,8,254,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,254,8,223,8,254,8,220,8,220,8,220,8,220,8,220,8,220,
+  8,220,8,220,8,220,8,220,8,220,8,220,8,220,8,254,8,254,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,8,32,
+  7,32,7,32,7,0,7,0,7,0,7,0,7,0,7,0,7,223,8,32,
+  8,223,8,32,8,223,8,32,8,32,8,32,8,223,8,223,8,0,7,0,
+  7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,
+  7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,
+  7,0,7,0,7,0,7,0,7,0,7,0,7,0,7 };
+
+struct FileDescriptor
+{
+  string name;
+  bool   isDirectory;
+
+  // sauce information
+  string title;
+  string artist;
+  string group;
+};
+
+void load()
+{
+  // TODO(rushfan): Fix this *** BROKEN ***
+#if 0
+  vector<FileDescriptor> files;
+  int readnew = 1;
+  FILE *fp;
+  struct dirent *direntp;
+  Sauce sauce;
+  DIR *dirp;
+
+  ansout << gotoxy(0, 0);
+  for (int x = 0; x <= 1950; x++) {
+    if (LoadAnsi[x << 1] == 0) {
+      LoadAnsi[x << 1] = ' ';
+    }
+    ansout << textattr(LoadAnsi[(x << 1) + 1]) << LoadAnsi[x << 1];
+    if (COLS>80 && (x + 1) % 80 == 0) {
+      ansout << endl;
+    }
+  }
+  ansout << setfill(' ');
+  SDL_Event event;
+  bool done = false;
+  unsigned int z = 0;
+  unsigned int y = 0;
+  do {
+    if (readnew == 1) {
+      z = y = 0;
+      readnew = 0;
+      files.clear();
+      dirp = opendir(".");
+      direntp = readdir(dirp);
+      if (dirp != NULL) {
+        for (;;) {
+          direntp = readdir(dirp);
+          if (direntp == NULL) break;
+          FileDescriptor newDescriptor;
+          newDescriptor.name = string(direntp->d_name);
+          errno = 0;
+
+          fp = fopen(direntp->d_name, "rb");
+          bool sauceRead = sauce.ReadSauce(fp);
+          if (errno == EISDIR || fp == NULL) {
+            newDescriptor.isDirectory = true;
+            files.push_back(newDescriptor);
+          }
+          else {
+            newDescriptor.isDirectory = false;
+            if (sauceRead) {
+              newDescriptor.title = string((const char*)sauce.Title);
+              newDescriptor.artist = string((const char*)sauce.Author);
+              newDescriptor.group = string((const char*)sauce.Group);
+            }
+            fclose(fp);
+            files.push_back(newDescriptor);
+          }
+        }
+      }
+      closedir(dirp);
+    }
+    for (unsigned int x = 0; x <= 8; x++) {
+      if (x + z < files.size()) {
+        ansout << gotoxy(2, 13 + x);
+        ansout << textattr(15 + (y == x ? 16 : 0));
+        if (files[x + z].isDirectory) {
+          ansout << textattr(7 + (y == x ? 16 : 0));
+        }
+        ansout << setw(12) << files[x + z].name;
+        ansout << gotoxy(14, 13 + x) << ' ';
+        if (!files[x + z].isDirectory) {
+          ansout << textattr(7 + (y == x ? 16 : 0));
+          ansout << (char)250;
+          ansout << textattr(15 + (y == x ? 16 : 0));
+          ansout << " " << setw(27) << files[x + z].title;
+          ansout << textattr(7 + (y == x ? 16 : 0));
+          ansout << (char)250;
+          ansout << textattr(14 + (y == x ? 16 : 0));
+          ansout << " " << setw(17) << files[x + z].artist;
+          ansout << textattr(7 + (y == x ? 16 : 0));
+          ansout << (char)250;
+          ansout << textattr(15 + (y == x ? 16 : 0));
+          ansout << setw(15) << files[x + z].group;
+        }
+        else {
+          ansout << textattr(8 + (y == x ? 16 : 0));
+          ansout << " <DiRECTORY>                                                    ";
+        }
+      }
+      else {
+        ansout << gotoxy(2, 13 + x) << textattr(7) << "                                                                             ";
+      }
+    }
+    screenEngine.showScreen();
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_ESCAPE:
+          done = true;
+          break;
+        case SDLK_RETURN:
+          if (files[y + z].isDirectory) {
+            chdir(files[y + z].name.c_str());
+            readnew = 1;
+          }
+          else {
+            MysticDrawMain::getInstance().getCurrentBuffer()->load((char*)files[y + z].name.c_str());
+            done = true;
+          }
+          break;
+        case SDLK_PAGEUP:
+          y = 0;
+          if (z < 8) {
+            z = 0;
+          }
+          else {
+            z -= 8;
+          }
+          break;
+        case SDLK_PAGEDOWN:
+          y = 8;
+          z += 8;
+          if (z + 9 > files.size()) z = files.size() - 9;
+          if (y + 1 > files.size()) {
+            y = files.size() - 1;
+            z = 0;
+          }
+          break;
+        case SDLK_UP:
+          if (y >= 1) {
+            y--;
+          }
+          else if (z > 0) {
+            z--;
+          }
+          break;
+        case SDLK_DOWN:
+          y++;
+          if (y>8) {
+            y = 8;
+            if (z + 9 < files.size()) z++;
+          }
+          if (y + 1 > files.size())  y = files.size() - 1;
+          break;
+        default:
+          break;
+        }
+      }
+    }
+  } while (!done);
+#endif
+}
+
+
+unsigned char ActiveMenue = 1, MaxItem;
+char * MenueItem[20], Length;
+int MouseX, MouseY;
+
+int Menues(int x, int y)
+{
+  int a, b, c, d;
+  DrawBox(x, y, x + Length + 1, y + MaxItem + 1);
+  b = 1;
+  c = 255;
+  SDL_Event event;
+  bool done = false;
+  do {
+    if (c != b) {
+      for (a = 1; a <= MaxItem; a++) {
+        ansout << gotoxy(x + 1, y + a);
+        if (b == a) ansout << textattr(32 + 15); else ansout << textattr(10);
+        for (d = 1; d <= 2; d++) {
+          ansout << MenueItem[a][d];
+        }
+        if (b == a) ansout << textattr(32 + 15); else ansout << textattr(2);
+        for (d = 3; d<Length - 6; d++) {
+          ansout << MenueItem[a][d];
+        }
+        if (b == a) ansout << textattr(32 + 8); else ansout << textattr(7);
+        for (d = Length - 6; d <= Length; d++) {
+          ansout << MenueItem[a][d];
+        }
+      }
+    }
+    c = b;
+#ifdef HAS_GPM
+    if (MouseSupport == TRUE)
+      Gpm_DrawPointer(mouse_x + 1, mouse_y + 1, 1);
+#endif
+    if (FullScreen) {
+      ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 0);
+    }
+    else {
+      ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 1);
+    }
+
+#ifdef HAS_GPM
+    if (MouseSupport == TRUE) {
+      mouse_update();
+      MouseX = mouse_getx();
+      MouseY = mouse_gety();
+      if (MouseX >= x&&MouseX <= x + Length + 1 && MouseY>y&&MouseY<y + MaxItem + 1) {
+        b = MouseY - y;
+        if (mouse_getbutton() == MOUSE_LEFTBUTTON) ch = 13;
+      }
+    }
+#endif
+    screenEngine.showScreen();
+    SDL_Delay(50);
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_QUIT:
+        exit(0);
+        break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_ESCAPE:
+          done = true;
+          break;
+        case SDLK_RETURN:
+          return b;
+        case SDLK_UP:
+          b--;
+          break;
+        case SDLK_DOWN:
+          b++;
+          break;
+        case SDLK_LEFT:
+          return 253;
+        case SDLK_RIGHT:
+          return 254;
+        default:
+          break;
+        }
+      }
+    }
+    if (b<1) b = 1;
+    if (b>MaxItem) b = MaxItem;
+
+#ifdef HAS_GPM
+    if (MouseSupport == TRUE) {
+      if (MouseX>79)
+        MouseX = 79;
+      if (MouseY>25)
+        MouseY = 25;
+      if (mouse_getbutton() == MOUSE_RIGHTBUTTON) ch = 27;
+      if (mouse_getbutton() == MOUSE_LEFTBUTTON&&MouseY == 1) {
+        if (MouseX >= 2 && MouseX <= 6) {
+          ActiveMenue = 1;
+          return 252;
+        }
+        if (MouseX >= 13 && MouseX <= 17) {
+          ActiveMenue = 2;
+          return 252;
+        }
+        if (MouseX >= 24 && MouseX <= 30) {
+          ActiveMenue = 3;
+          return 252;
+        }
+        if (MouseX >= 37 && MouseX <= 42) {
+          ActiveMenue = 4;
+          return 252;
+        }
+        if (MouseX >= 49 && MouseX <= 53) {
+          ActiveMenue = 5;
+          return 252;
+        }
+        if (MouseX >= 62 && MouseX <= 68) {
+          ActiveMenue = 6;
+          return 252;
+        }
+        if (MouseX >= 73 && MouseX <= 76) {
+          ActiveMenue = 7;
+          return 252;
+        }
+      }
+    }
+#endif
+  } while (!done);
+#ifdef HAS_GPM
+  if (MouseSupport == TRUE)
+    do {
+      mouse_update();
+    } while (mouse_getbutton() == MOUSE_RIGHTBUTTON);
+#endif
+    return 255;
+}
+
+int menue()
+{
+  int x, a, b;
+  b = 0;
+  ActiveMenue = 1;
+#ifdef HAS_GPM
+  if (MouseSupport == TRUE)
+    do {
+      mouse_update();
+    } while (mouse_getbutton() == MOUSE_RIGHTBUTTON);
+#endif
+    do {
+      a = 0;
+      if (ActiveMenue != b) {
+        if (FullScreen) {
+          MysticDrawMain::getInstance().drawScreen(1, 25);
+        }
+        else {
+          MysticDrawMain::getInstance().drawScreen(1, 24);
+        }
+        ansout << gotoxy(0, 0) << textattr(8);
+        ansout << (char)223;
+        ansout << textattr(7);
+        ansout << ' ';
+        ansout << textattr(8);
+        for (x = 1; x<79; x++) {
+          ansout << (char)220;
+        }
+        ansout << textattr(7);
+        ansout << gotoxy(79, 0);
+        ansout << (char)223;
+        ansout << gotoxy(0, 1);
+        ansout << textattr(2);
+        ansout << (char)223;
+        if (ActiveMenue == 1) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << " FILES      ";
+        if (ActiveMenue == 2) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "FONTS      ";
+        if (ActiveMenue == 3) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "OPTIONS      ";
+        if (ActiveMenue == 4) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "SCREEN      ";
+        if (ActiveMenue == 5) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "MISC.        ";
+        if (ActiveMenue == 6) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "TOGGLES    ";
+        if (ActiveMenue == 7) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        ansout << "HELP";
+        ansout << textattr(2);
+        ansout << (char)219 << (char)220 << (char)223;
+      }
+      b = ActiveMenue;
+      switch (ActiveMenue) {
+      case 1:
+        MenueItem[1] = " LOAD       ALT+L  ";
+        MenueItem[2] = " SAVE       ALT+S  ";
+        MenueItem[3] = " QUIT       ALT+X  ";
+        Length = 18;
+        MaxItem = 3;
+        a = Menues(0, 2);
+        break;
+      case 2:
+        MenueItem[1] = " SELECT FONT    ALT+F  ";
+        MenueItem[2] = " FONT MODE      ALT+N  ";
+        MenueItem[3] = " OUTLINE TYPE   ALT+W  ";
+        Length = 22;
+        MaxItem = 3;
+        a = Menues(12, 2);
+        break;
+      case 3:
+        MenueItem[1] = " SAUCE SETUP   CTRL+S ";
+        MenueItem[2] = " SET PAGE      ALT+P  ";
+        MenueItem[3] = " TAB SETUP     ALT+T  ";
+        MenueItem[4] = " GLOBAL        ALT+G  ";
+        MenueItem[5] = " SET EFFECT    ALT+M  ";
+        Length = 20;
+        MaxItem = 5;
+        a = Menues(25, 2);
+        break;
+      case 4:
+        MenueItem[1] = " CLEAR PAGE    ALT+C  ";
+        MenueItem[2] = " INSERT LINE   ALT+I  ";
+        MenueItem[3] = " DELTE LINE    ALT+Y  ";
+        MenueItem[4] = " INSERT COLUMN ALT+1  ";
+        MenueItem[5] = " DELTE COLUMN  ALT+2  ";
+        MenueItem[6] = " UNDO/RESTORE  ALT+R  ";
+        Length = 21;
+        MaxItem = 6;
+        a = Menues(38, 2);
+        break;
+      case 5:
+        MenueItem[1] = " SET COLORS    ALT+A  ";
+        MenueItem[2] = " PICK UP COLOR ALT+U  ";
+        MenueItem[3] = " ASCII TABLE   ALT+K  ";
+        Length = 21;
+        MaxItem = 3;
+        a = Menues(50, 2);
+        break;
+      case 6:
+        MenueItem[1] = " LINE DRAW        ALT+D  ";
+        MenueItem[2] = " DRAW MODE        ALT+-  ";
+        MenueItem[3] = " INSERT MODE      INS    ";
+        MenueItem[4] = " VIEW IN 320x200  ALT+V  ";
+        MenueItem[5] = " ELITE MODE       ALT+E  ";
+        Length = 24;
+        MaxItem = 5;
+        a = Menues(53, 2);
+        break;
+      case 7:
+        MenueItem[1] = " HELP         ALT+H  ";
+        MenueItem[2] = " ABOUT               ";
+        Length = 20;
+        MaxItem = 2;
+        a = Menues(56, 2);
+        break;
+      };
+      switch (a) {
+      case 253:
+        ActiveMenue--;
+        break;
+      case 254:
+        ActiveMenue++;
+        break;
+      case 255:
+        return 0;
+        break;
+      };
+      if (ActiveMenue<1) ActiveMenue = 7;
+      if (ActiveMenue>7) ActiveMenue = 1;
+    } while (a>200);
+#ifdef HAS_GPM
+    if (MouseSupport == TRUE)
+      do {
+        mouse_update();
+      } while (mouse_getbutton() == MOUSE_RIGHTBUTTON);
+#endif
+      return a + (ActiveMenue << 8);
+}
+
+void menuemode()
+{
+  unsigned int a = 0;
+  a = menue();
+  HelpCommand           helpCommand(&MysticDrawMain::getInstance());
+  ASCIITableCommand     asciiTableCommand(&MysticDrawMain::getInstance());
+  TabulatorSetupCommand tabulatorSetupCommand(&MysticDrawMain::getInstance());
+  SelectFontCommand     selectFontCommand(&MysticDrawMain::getInstance());
+  SelectOutlineCommand  selectOutlineCommand(&MysticDrawMain::getInstance());
+  SelectSauceCommand    selectSauceCommand(&MysticDrawMain::getInstance());
+  DrawCommand           drawCommand(&MysticDrawMain::getInstance());
+  DrawLineCommand       drawLineCommand(&MysticDrawMain::getInstance());
+  SelectEffectModeCommand   selectEffectCommand(&MysticDrawMain::getInstance());
+  SelectColorCommand selectColorCommand(&MysticDrawMain::getInstance());
+
+  switch ((a & 0xFF00) >> 8) {
+  case 1:
+    switch (a & 0xFF) {
+    case 1:
+      load();
+      break;
+    case 2:
+      save();
+      break;
+    case 3:
+      MysticDrawMain::getInstance().exitMysticDraw();
+      break;
+    }
+    break;
+  case 2:
+    switch (a & 0xFF) {
+    case 1:
+      selectFontCommand.run();
+      break;
+    case 2:
+      MysticDrawMain::getInstance().getCaret().fontMode() = !MysticDrawMain::getInstance().getCaret().fontMode();
+      Undo = false;
+      SaveScreen();
+      break;
+    case 3:
+      selectOutlineCommand.run();
+      break;
+    }
+    break;
+  case 3:
+    switch (a & 0xFF) {
+    case 1:
+      selectSauceCommand.run();
+      break;
+    case 2:
+      SetPage();
+      break;
+    case 3:
+      tabulatorSetupCommand.run();
+      break;
+    case 4:
+      global();
+      break;
+    case 5:
+      selectEffectCommand.run();
+      break;
+    }
+    break;
+  case 4:
+    switch (a & 0xFF) {
+    case 1:
+      ClearScreen();
+      break;
+    case 2:
+      MysticDrawMain::getInstance().getCurrentBuffer()->insertLine(MysticDrawMain::getInstance().getCaret().getLogicalY());
+      break;
+    case 3:
+      MysticDrawMain::getInstance().getCurrentBuffer()->removeLine(MysticDrawMain::getInstance().getCaret().getLogicalY());
+      break;
+    case 4:
+      MysticDrawMain::getInstance().getCurrentBuffer()->insertColumn(MysticDrawMain::getInstance().getCaret().getX());
+      break;
+    case 5:
+      MysticDrawMain::getInstance().getCurrentBuffer()->removeColumn(MysticDrawMain::getInstance().getCaret().getX());
+      break;
+    case 6:
+      UndoLast();
+      break;
+    }
+    break;
+  case 5:
+    switch (a & 0xFF) {
+    case 1:
+      selectColorCommand.run();
+      break;
+    case 2:
+      Attribute = MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(MysticDrawMain::getInstance().getCaret().getLogicalY(), MysticDrawMain::getInstance().getCaret().getX());
+      break;
+    case 3:
+      asciiTableCommand.run();
+      break;
+    }
+    break;
+  case 6:
+    switch (a & 0xFF) {
+    case 1:
+      drawLineCommand.run();
+      break;
+    case 2:
+      drawCommand.run();
+      break;
+    case 3:
+      MysticDrawMain::getInstance().getCaret().insertMode() = !MysticDrawMain::getInstance().getCaret().insertMode();
+      break;
+#ifdef HAS_SVGALIB
+    case 4:
+      viewmode();
+      break;
+#endif
+    case 5:
+      MysticDrawMain::getInstance().getCaret().eliteMode() = !MysticDrawMain::getInstance().getCaret().eliteMode();
+      break;
+    }
+  case 7:
+    switch (a & 0xFF) {
+    case 1:
+      helpCommand.run();
+      break;
+    case 2:
+      about();
+      break;
+    }
+    break;
+  }
+}
 
 void Caret::checkCaretPosition()
 {
@@ -104,7 +1345,7 @@ MysticDrawMain MysticDrawMain::mysticDrawMain;
 
 MysticDrawMain& MysticDrawMain::getInstance()
 {
-	return mysticDrawMain;
+  return mysticDrawMain;
 }
 
 void MysticDrawMain::drawStatusLine()
@@ -180,9 +1421,8 @@ void MysticDrawMain::loadconfig()
 			fread(&FullScreen,1,1,fp);
 		}
 		fclose(fp);
-	} else {
+  } else {
 		cout << "Error opening configuration file check that " << getConfigurationFileName() << " exists" << endl;
-		configrationLoaded = false;
 	}
 }
 
@@ -244,20 +1484,20 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 #endif
 	screenEngine.LoadFont(args);
 	
-	HelpCommand           helpCommand;
-	ASCIITableCommand     asciiTableCommand;
-	TabulatorSetupCommand tabulatorSetupCommand;
-	SelectFontCommand     selectFontCommand;
-	SelectOutlineCommand  selectOutlineCommand;
-	SelectSauceCommand    selectSauceCommand;
-	DrawCommand           drawCommand;
-	DrawLineCommand       drawLineCommand;
-	SelectEffectModeCommand   selectEffectCommand;
-	SelectColorCommand selectColorCommand;
-	BlockModeCommand     blockModeCommand;
-	FontEditorCommand    fontEditorCommand;
-	PaletteEditorCommand paletteEditorCommand;
-	ViewModeCommand      viewModeCommand;
+  HelpCommand           helpCommand(&MysticDrawMain::getInstance());
+	ASCIITableCommand     asciiTableCommand(&MysticDrawMain::getInstance());
+	TabulatorSetupCommand tabulatorSetupCommand(&MysticDrawMain::getInstance());
+	SelectFontCommand     selectFontCommand(&MysticDrawMain::getInstance());
+	SelectOutlineCommand  selectOutlineCommand(&MysticDrawMain::getInstance());
+	SelectSauceCommand    selectSauceCommand(&MysticDrawMain::getInstance());
+	DrawCommand           drawCommand(&MysticDrawMain::getInstance());
+	DrawLineCommand       drawLineCommand(&MysticDrawMain::getInstance());
+	SelectEffectModeCommand   selectEffectCommand(&MysticDrawMain::getInstance());
+	SelectColorCommand selectColorCommand(&MysticDrawMain::getInstance());
+	BlockModeCommand     blockModeCommand(&MysticDrawMain::getInstance());
+	FontEditorCommand    fontEditorCommand(&MysticDrawMain::getInstance());
+	PaletteEditorCommand paletteEditorCommand(&MysticDrawMain::getInstance());
+	ViewModeCommand      viewModeCommand(&MysticDrawMain::getInstance());
 	SDL_Event event;
 	
 	done = false;
@@ -532,9 +1772,9 @@ void MysticDrawMain::renderFontCharacter(char c)
 		return;
 	}
 	
-	if (getCaret().getLogicalX() + fl->maxX + fl->getCurrentFont()->spaces > getCurrentBuffer()->getWidth() |
-	    fl->maxX == 0 |
-		fl->maxY + getCaret().getLogicalY() > getCurrentBuffer()->getHeight())  {
+	if (getCaret().getLogicalX() + fl->maxX + fl->getCurrentFont()->spaces > getCurrentBuffer()->getWidth() 
+    || fl->maxX == 0
+    || fl->maxY + getCaret().getLogicalY() > getCurrentBuffer()->getHeight())  {
 		return;
 	}
 	
@@ -684,9 +1924,11 @@ extern "C" FILE * __cdecl __iob_func(void)
 
 int main(int argnum,char *args[]) 
 {
-	MysticDrawMain::getInstance().startMysticDraw(argnum, args);
-
+  auto md = new MysticDrawMain();
+  md->startMysticDraw(argnum, args);
+  delete md;
   
   cout << "Thank you for using Mystic Draw" << endl;
-   return 0;
+  exit(0);
+  return 0;
 }

@@ -1,7 +1,9 @@
 #ifndef FONTEDITORCOMMAND__HPP
 #define FONTEDITORCOMMANDP__HPP
-#include<bio_crt.h>
-#include<command.hpp>
+#include <bio_crt.h>
+#include <command.hpp>
+
+class MysticDrawMain;
 
 class FontEditorCommand : public Command
 {
@@ -18,8 +20,7 @@ class FontEditorCommand : public Command
 		void cursorRight();
 	public:
 	
-		FontEditorCommand()
-		{
+		FontEditorCommand(MysticDrawMain* win) : Command(win) {
 			selectMode = true;
 			cursorX = 0;
 			cursorY = 0;

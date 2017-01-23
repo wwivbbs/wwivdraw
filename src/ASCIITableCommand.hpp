@@ -5,11 +5,14 @@
 #include<command.hpp>
 #include<MysticDrawMain.hpp>
 
+class MysticDrawMain;
+
 class ASCIITableCommand : public Command
 {
 	private:
 		unsigned char show_ASCIITable();
 	public:
+    ASCIITableCommand(MysticDrawMain* win) : Command(win) {}
 		void run();
 };
 

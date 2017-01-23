@@ -6,6 +6,7 @@
 class PaletteEditorCommand : public Command
 {
 	public:
+    PaletteEditorCommand(MysticDrawMain* win) : Command(win) {}
 		void run();
 };
 

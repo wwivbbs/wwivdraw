@@ -8,14 +8,11 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-// #include <unistd.h>
 #include <string>
 #include <iomanip>
-#ifdef HAS_SVGALIB
-#include<vga.h>
-#endif
 
 #include "bio_crt.h"
+#include "caret.h"
 
 #include "ScreenBuffer.hpp"
 #include "command.hpp"
@@ -59,181 +56,6 @@ struct teffekt  {
 extern teffekt effect;
 
 using namespace std;
-class Caret
-{
-	private:
-		int caretX;
-		int caretY;
-		int upperLeftCornerLine;
-		int upperLeftCornerRow;
-		
-		bool isInInsertMode;
-		bool isInEliteMode;
-		bool isInFontMode;
-	public:
-		Caret()
-		{
-			caretX = 0;
-			caretY = 0;
-			upperLeftCornerLine = 0;
-			upperLeftCornerRow  = 0;
-			isInInsertMode = false;
-			isInEliteMode = false;
-		}
-		
-		int& getX()
-		{
-			return caretX;
-		}
-		
-		int& getY()
-		{
-			return caretY;
-		}
-		
-		int& getUpperLeftCornerLine()
-		{
-			return upperLeftCornerLine;
-		}
-		
-		int& getUpperLeftCornerRow()
-		{
-			return upperLeftCornerRow;
-		}
-		
-		int getLogicalY()
-		{
-			return caretY + upperLeftCornerLine;
-		}
-		
-		int getLogicalX()
-		{
-			return caretX + upperLeftCornerRow;
-		}
-		
-		bool& insertMode()
-		{
-			// guard against 'stange' insertMode values (like insertMode == 6 which switches between 6/7)
-			if (isInInsertMode) {
-				isInInsertMode = true;
-			}
-				
-			return isInInsertMode;
-		}
-		
-		bool& eliteMode()
-		{
-			// guard against 'stange' eliteMode values (like eliteMode == 6 which switches between 6/7)
-			if (isInEliteMode) {
-				isInEliteMode = true;
-			}
-			return isInEliteMode;
-		}
-		
-		bool& fontMode()
-		{
-			// guard against 'stange' eliteMode values (like eliteMode == 6 which switches between 6/7)
-			if (isInFontMode) {
-				isInFontMode = true;
-			}
-			return isInFontMode;
-		}
-		
-		void checkCaretPosition();
-		
-		bool handleKeyStroke(SDL_Event* event)
-		{
-#ifdef HAS_GPM
-			if (MouseSupport) {      
-				mouse_update();
-				caretX += mouse_deltax;
-				caretY += mouse_deltay;
-				mouse_deltax=0;
-				mouse_deltay=0;
-			}
-#endif
-			switch (event->key.keysym.sym) {   
-				case SDLK_DOWN:
-					caretY++;
-					checkCaretPosition();
-					return true;
-				case SDLK_UP:
-					caretY--;
-					checkCaretPosition();
-					return true;
-				case SDLK_LEFT:
-					caretX--;
-					checkCaretPosition();
-					return true;
-				case SDLK_RIGHT:
-					caretX++;
-					checkCaretPosition();
-					return true;
-				case SDLK_PAGEDOWN:
-					upperLeftCornerLine += LINES-1;
-					if (FullScreen) {
-						caretY = LINES-1;
-					} else {
-						caretY=LINES-2;
-					}
-					checkCaretPosition();
-					return true;
-				case SDLK_PAGEUP:
-					upperLeftCornerLine -= LINES-1;
-					caretY=0;
-					checkCaretPosition();
-					return true;
-				case SDLK_HOME:
-					caretX = 0;
-					checkCaretPosition();
-					return true;
-				case SDLK_END:
-					caretX = 79;
-					checkCaretPosition();
-					return true;
-				default:
-					break;
-			}
-			if (event->key.keysym.mod & KMOD_SHIFT) {
-				switch (event->key.keysym.sym) {   
-					case SDLK_F1:
-						ActiveCharset=1;
-						return true;
-					case SDLK_F2:
-						ActiveCharset=2;
-						return true;
-					case SDLK_F3:
-						ActiveCharset=3;
-						return true;
-					case SDLK_F4:
-						ActiveCharset=4;
-						return true;
-					case SDLK_F5:
-						ActiveCharset=5;
-						return true;
-					case SDLK_F6:
-						ActiveCharset=6;
-						return true;
-					case SDLK_F7:
-						ActiveCharset=7;
-						return true;
-					case SDLK_F8:
-						ActiveCharset=8;
-						return true;
-					case SDLK_F9:
-						ActiveCharset=9;
-						return true;
-					case SDLK_F10:
-						ActiveCharset=10;
-						return true;
-					default:
-						break;
-				}
-			}
-			return false;
-		}
-};
-
 class MysticDrawMain
 {
 	private:
@@ -244,7 +66,6 @@ class MysticDrawMain
 		ScreenBuffer** screen;
 		
 		Caret caret;
-		bool configrationLoaded;
 		
 		const string getConfigurationFileName()
 		{

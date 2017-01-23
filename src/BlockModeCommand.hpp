@@ -10,6 +10,7 @@ class BlockModeCommand : public Command
 		int X1,Y1,X2,Y2;
 		void CopyBlock(char Mode);
 	public:
+    BlockModeCommand(MysticDrawMain* win) : Command(win) {}
 		void run();
 };
 #endif

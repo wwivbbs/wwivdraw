@@ -4,9 +4,12 @@
 #include<MysticDrawMain.hpp>
 #include<command.hpp>
 
+class MysticDrawMain;
+
 class TabulatorSetupCommand : public Command
 {
 	public:
+    TabulatorSetupCommand(MysticDrawMain* win) : Command(win) {}
 		void run();
 };
 
