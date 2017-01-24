@@ -8,11 +8,11 @@ class MysticDrawMain;
 
 class ASCIITableCommand : public Command
 {
-	private:
-		unsigned char show_ASCIITable();
-	public:
-    ASCIITableCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+private:
+  unsigned char show_ASCIITable();
+public:
+  ASCIITableCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 #endif

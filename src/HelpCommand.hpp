@@ -7,9 +7,9 @@ class MysticDrawMain;
 
 class HelpCommand : public Command
 {
-	public:
-    HelpCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+public:
+  HelpCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 #endif

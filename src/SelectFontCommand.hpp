@@ -12,23 +12,23 @@ class MysticDrawMain;
 
 class SelectOutlineCommand : public Command
 {
-		private:
-			void setunderground(int Underg,int b);
-			
-		public:
-      SelectOutlineCommand(MysticDrawMain* win) : Command(win) {}
-			void run();
+private:
+  void setunderground(int Underg, int b);
+
+public:
+  SelectOutlineCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 class SelectFontCommand : public Command
 {
-	private:
-		void clearWindow();
-		void showPreviewCharacter(int fontNumber);
-		
-	public:
-    SelectFontCommand(MysticDrawMain* win) : Command(win) {}
-    void run();
+private:
+  void clearWindow();
+  void showPreviewCharacter(int fontNumber);
+
+public:
+  SelectFontCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 #endif

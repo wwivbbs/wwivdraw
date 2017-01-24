@@ -10,9 +10,9 @@ class ScreenBuffer;
 
 class SelectSauceCommand : Command
 {
-	public:
-    SelectSauceCommand(MysticDrawMain* win);
-		void run();
+public:
+  SelectSauceCommand(MysticDrawMain* win);
+  void run();
 private:
   ScreenBuffer* screen_buffer_ = nullptr;
 };

@@ -10,10 +10,10 @@ class Caret;
 
 class BlockModeCommand : public Command
 {
-	public:
-    BlockModeCommand(MysticDrawMain* win, ScreenBuffer* screen_buffer, Caret* caret)
-      : Command(win) {}
-		void run();
+public:
+  BlockModeCommand(MysticDrawMain* win, ScreenBuffer* screen_buffer, Caret* caret)
+    : Command(win) {}
+  void run();
 
 private:
   int X1, Y1, X2, Y2;

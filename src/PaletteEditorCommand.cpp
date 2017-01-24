@@ -1,7 +1,7 @@
 #include<HelpCommand.hpp>
 #include "mdraw.h"
 
-unsigned char paletteAnsi[1600]={
+unsigned char paletteAnsi[1600] = {
 179,7,196,7,32,7,80,7,97,7,108,7,101,7,116,7,116,7,101,7,32,7,69,7,100,7,105,7,116,7,111,7,114,7,32,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,179,7,
 179,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,179,7,
 179,7,82,7,101,7,100,7,32,7,58,7,32,7,91,7,48,7,48,7,93,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,71,7,114,7,101,7,101,7,110,7,32,7,58,7,32,7,91,7,48,7,48,7,93,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,82,7,101,7,100,7,32,7,58,7,32,7,91,7,48,7,48,7,93,7,32,7,32,7,32,7,32,7,32,7,179,7,
@@ -11,106 +11,110 @@ unsigned char paletteAnsi[1600]={
 179,7,32,7,67,7,117,7,114,7,115,7,111,7,114,7,32,7,75,7,101,7,121,7,115,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,179,7,
 179,7,32,7,43,7,47,7,45,7,32,7,73,7,110,7,99,7,114,7,101,7,97,7,115,7,101,7,47,7,68,7,101,7,99,7,114,7,101,7,97,7,115,7,101,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,179,7,
 179,7,32,7,91,7,82,7,69,7,84,7,85,7,82,7,78,7,93,7,32,7,69,7,110,7,116,7,101,7,114,7,32,7,110,7,117,7,109,7,98,7,101,7,114,7,32,7,40,7,48,7,45,7,54,7,51,7,41,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,32,7,179,7,
-179,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,179,7};
+179,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,196,7,179,7 };
 
 void PaletteEditorCommand::run()
 {
-	SDL_Event event;
-	bool done = false;
-	int  currentColor = 0;
-	int  currentRGB   = 0;
-	
-	Uint8* palette = screenEngine.getPalette();
-	char xOffs[] = {8 ,39, 71};
-	char savePal[3 * 16];
-	copy(palette, palette + 3 * 16, savePal);
-	
-	do {
-		ansout << gotoxy(0, 16);
-		for (unsigned int x = 0; x < sizeof(paletteAnsi) / 2; ++x) {
-			if (paletteAnsi[x << 1] == 0) {
-				paletteAnsi[x << 1] = ' ';
-			}
-			ansout << textattr(paletteAnsi[(x<<1) + 1]) << paletteAnsi[x<<1];
-			if (COLS > 80 && x % 80 == 0) {
-				ansout << endl;
-			}
-		}
-		
-		ansout << gotoxy(xOffs[currentRGB], 17);
-		ansout << "\\|/";
-		
-		ansout << gotoxy(1 + currentColor * 5, 19);
-		ansout << "vvv";
-		
-		ansout << setw(2) << setfill('0'); 
-		ansout << gotoxy(8, 18);
-		ansout << (int)*(palette + currentColor * 3);
-		ansout << gotoxy(39, 18);
-		ansout << (int)*(palette + currentColor * 3 + 1);
-		ansout << gotoxy(71, 18);
-		ansout << (int)*(palette + currentColor * 3 + 2);
-		ansout << setw(1); 
-		
-		
-		screenEngine.showScreen();
-		SDL_Delay(50);
-		
-		while (SDL_PollEvent(&event)) {
-			switch (event.type){
-				case SDL_QUIT:
-					exit(0);
-					break;
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case SDLK_RETURN:
-							done = true;
-							break;
-						case SDLK_ESCAPE:
-							done = true;
-							copy(savePal, savePal + 3 * 16, palette);
-							break;
-						case SDLK_UP:
-							if (currentColor < 15) {
-								currentColor++;
-							} else {
-								currentColor = 0;
-							}
-							break;
-						case SDLK_DOWN:
-							if (currentColor > 0) {
-								currentColor--;
-							} else {
-								currentColor = 15;
-							}
-							break;
-						case SDLK_RIGHT:
-							if (currentRGB < 2) {
-								currentRGB++;
-							} else {
-								currentRGB = 0;
-							}
-							break;
-						case SDLK_LEFT:
-							if (currentRGB > 0) {
-								currentRGB--;
-							} else {
-								currentRGB = 2;
-							}
-							break;
-						default:
-							switch (event.key.keysym.unicode) {
-								case '+':
-									*(palette + currentColor * 3 + currentRGB) = min(*(palette + currentColor * 3 + currentRGB) + 1, 63);
-									break;
-								case '-':
-									*(palette + currentColor * 3 + currentRGB) = max(*(palette + currentColor * 3 + currentRGB) - 1, 0);
-									break;
-							}
-							break;
-					}
-					break;
-			}
-		}
-	} while (!done);  
+  SDL_Event event;
+  bool done = false;
+  int  currentColor = 0;
+  int  currentRGB = 0;
+
+  Uint8* palette = screenEngine.getPalette();
+  char xOffs[] = { 8 ,39, 71 };
+  char savePal[3 * 16];
+  copy(palette, palette + 3 * 16, savePal);
+
+  do {
+    ansout << gotoxy(0, 16);
+    for (unsigned int x = 0; x < sizeof(paletteAnsi) / 2; ++x) {
+      if (paletteAnsi[x << 1] == 0) {
+        paletteAnsi[x << 1] = ' ';
+      }
+      ansout << textattr(paletteAnsi[(x << 1) + 1]) << paletteAnsi[x << 1];
+      if (COLS > 80 && x % 80 == 0) {
+        ansout << endl;
+      }
+    }
+
+    ansout << gotoxy(xOffs[currentRGB], 17);
+    ansout << "\\|/";
+
+    ansout << gotoxy(1 + currentColor * 5, 19);
+    ansout << "vvv";
+
+    ansout << setw(2) << setfill('0');
+    ansout << gotoxy(8, 18);
+    ansout << (int)*(palette + currentColor * 3);
+    ansout << gotoxy(39, 18);
+    ansout << (int)*(palette + currentColor * 3 + 1);
+    ansout << gotoxy(71, 18);
+    ansout << (int)*(palette + currentColor * 3 + 2);
+    ansout << setw(1);
+
+
+    screenEngine.showScreen();
+    SDL_Delay(50);
+
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_QUIT:
+        exit(0);
+        break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_RETURN:
+          done = true;
+          break;
+        case SDLK_ESCAPE:
+          done = true;
+          copy(savePal, savePal + 3 * 16, palette);
+          break;
+        case SDLK_UP:
+          if (currentColor < 15) {
+            currentColor++;
+          }
+          else {
+            currentColor = 0;
+          }
+          break;
+        case SDLK_DOWN:
+          if (currentColor > 0) {
+            currentColor--;
+          }
+          else {
+            currentColor = 15;
+          }
+          break;
+        case SDLK_RIGHT:
+          if (currentRGB < 2) {
+            currentRGB++;
+          }
+          else {
+            currentRGB = 0;
+          }
+          break;
+        case SDLK_LEFT:
+          if (currentRGB > 0) {
+            currentRGB--;
+          }
+          else {
+            currentRGB = 2;
+          }
+          break;
+        default:
+          switch (event.key.keysym.unicode) {
+          case '+':
+            *(palette + currentColor * 3 + currentRGB) = min(*(palette + currentColor * 3 + currentRGB) + 1, 63);
+            break;
+          case '-':
+            *(palette + currentColor * 3 + currentRGB) = max(*(palette + currentColor * 3 + currentRGB) - 1, 0);
+            break;
+          }
+          break;
+        }
+        break;
+      }
+    }
+  } while (!done);
 }

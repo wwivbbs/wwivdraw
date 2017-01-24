@@ -6,19 +6,19 @@
 
 class DrawCommand : Command
 {
-	private:
-		unsigned int drawMode;
-		void selectDrawMode();		
-	public: 
-    DrawCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+private:
+  unsigned int drawMode;
+  void selectDrawMode();
+public:
+  DrawCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 class DrawLineCommand : Command
 {
-	public: 
-    DrawLineCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+public:
+  DrawLineCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 

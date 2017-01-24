@@ -206,7 +206,7 @@ unsigned char SauceAnsi[4096] = {
 232,121,9,232,160,0,139,196,5,19,0,177,4,211,232,140,210,3,194,163,
 10,0,163,12,0,3,6,4,0,163,14,0,163,24,0,163,28,0,163,36,
 0,142,6,56,0,38,161,2,0,163,32,0,199,6,42,0,214,0,140,14,
-44,0,191,84,3,190,57,2,185,19,0,144,252,46,172};
+44,0,191,84,3,190,57,2,185,19,0,144,252,46,172 };
 
 
 SelectSauceCommand::SelectSauceCommand(MysticDrawMain* win)
@@ -214,94 +214,96 @@ SelectSauceCommand::SelectSauceCommand(MysticDrawMain* win)
 
 void SelectSauceCommand::run()
 {
-	char *nul;
-	int  a=0;
-	unsigned int b;
-	ansout << gotoxy(0, 0);
-	for (int x = 0;x < 2000; ++x) {
-		if (SauceAnsi[x<<1]==0) {
-			SauceAnsi[x<<1]=32;
-		}
-		ansout << textattr(SauceAnsi[(x<<1)+1]) << SauceAnsi[x<<1];
-		if (COLS>80&&(x+1)%80==0) {
-			ansout << endl;
-		}
-	}
-	
-	Sauce* sauce = &screen_buffer_->getSauce();
-	
-	bool done = false;
-	SDL_Event event;
-	do {
-		ansout << textattr(15) << gotoxy(28, 10) << sauce->Title;
-		ansout << textattr(7);
-		for (b=strlen((const char*)sauce->Title);b<35;b++) {
-			ansout << (char)250;
-		}
-		
-		ansout << gotoxy(28, 11) << textattr(15) << sauce->Author;
-		ansout << textattr(7);
-		for (b=strlen((const char*)sauce->Author);b<20;b++) ansout << (char)250;
-		ansout << gotoxy(28, 12) << textattr(15) << sauce->Group;
-		ansout << textattr(7);
-		for (b=strlen((const char*)sauce->Group);b<20;b++) ansout << (char)250;
-		ansout << gotoxy(40, 8) << textattr(15);
-		if (screen_buffer_->doSaveSauce()) {
-			ansout << 'x';
-		} else {
-			ansout << ' ';
-		}
-		ansout << gotoxy(49, 8);
-		if (screen_buffer_->doSaveSauce()) {
-			ansout << ' '; 
-		} else {
-			ansout << 'x';
-		}
-		ansout << gotoxy(14, 8) << ' ';
-		ansout << gotoxy(14, 10) << ' ';
-		ansout << gotoxy(14, 11) << ' ';
-		ansout << gotoxy(14, 12) << ' ';
-		ansout << textattr(14) << gotoxy(14, 8+a+(a>0)) << '>'; 
-		screenEngine.showScreen();
-		SDL_Delay(50);
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case SDLK_ESCAPE:
-							done = true;
-							break;
-						case SDLK_RETURN:
-							switch(a) {
-								case 0:
-                  screen_buffer_->doSaveSauce() = !screen_buffer_->doSaveSauce();
-									break;
-								case 1:
-									nul = inputfield((char*)sauce->Title,35,28,10);
-									for (b=0;b<=strlen(nul);b++) {
-										sauce->Title[b]=nul[b];
-									}
-									break;
-								case 2:
-									nul=inputfield((char*)sauce->Author,20,28,11);
-									for (b=0;b<=strlen(nul);b++) sauce->Author[b]=nul[b];
-									break;
-								case 3:
-									nul=inputfield((char*)sauce->Group,20,28,12);
-									for (b=0;b<=strlen(nul);b++) sauce->Group[b]=nul[b];
-									break;
-							}
-							break;
-						case SDLK_UP:
-							if (a>0) a--; else a=3;
-							break;
-						case SDLK_DOWN:
-							if (a<3) a++; else a=0;
-							break;
-						default:
-							break;
-					}
-			}
-		}
-	} while (!done);
+  char *nul;
+  int  a = 0;
+  unsigned int b;
+  ansout << gotoxy(0, 0);
+  for (int x = 0; x < 2000; ++x) {
+    if (SauceAnsi[x << 1] == 0) {
+      SauceAnsi[x << 1] = 32;
+    }
+    ansout << textattr(SauceAnsi[(x << 1) + 1]) << SauceAnsi[x << 1];
+    if (COLS > 80 && (x + 1) % 80 == 0) {
+      ansout << endl;
+    }
+  }
+
+  Sauce* sauce = &screen_buffer_->getSauce();
+
+  bool done = false;
+  SDL_Event event;
+  do {
+    ansout << textattr(15) << gotoxy(28, 10) << sauce->Title;
+    ansout << textattr(7);
+    for (b = strlen((const char*)sauce->Title); b < 35; b++) {
+      ansout << (char)250;
+    }
+
+    ansout << gotoxy(28, 11) << textattr(15) << sauce->Author;
+    ansout << textattr(7);
+    for (b = strlen((const char*)sauce->Author); b < 20; b++) ansout << (char)250;
+    ansout << gotoxy(28, 12) << textattr(15) << sauce->Group;
+    ansout << textattr(7);
+    for (b = strlen((const char*)sauce->Group); b < 20; b++) ansout << (char)250;
+    ansout << gotoxy(40, 8) << textattr(15);
+    if (screen_buffer_->doSaveSauce()) {
+      ansout << 'x';
+    }
+    else {
+      ansout << ' ';
+    }
+    ansout << gotoxy(49, 8);
+    if (screen_buffer_->doSaveSauce()) {
+      ansout << ' ';
+    }
+    else {
+      ansout << 'x';
+    }
+    ansout << gotoxy(14, 8) << ' ';
+    ansout << gotoxy(14, 10) << ' ';
+    ansout << gotoxy(14, 11) << ' ';
+    ansout << gotoxy(14, 12) << ' ';
+    ansout << textattr(14) << gotoxy(14, 8 + a + (a > 0)) << '>';
+    screenEngine.showScreen();
+    SDL_Delay(50);
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_ESCAPE:
+          done = true;
+          break;
+        case SDLK_RETURN:
+          switch (a) {
+          case 0:
+            screen_buffer_->doSaveSauce() = !screen_buffer_->doSaveSauce();
+            break;
+          case 1:
+            nul = inputfield((char*)sauce->Title, 35, 28, 10);
+            for (b = 0; b <= strlen(nul); b++) {
+              sauce->Title[b] = nul[b];
+            }
+            break;
+          case 2:
+            nul = inputfield((char*)sauce->Author, 20, 28, 11);
+            for (b = 0; b <= strlen(nul); b++) sauce->Author[b] = nul[b];
+            break;
+          case 3:
+            nul = inputfield((char*)sauce->Group, 20, 28, 12);
+            for (b = 0; b <= strlen(nul); b++) sauce->Group[b] = nul[b];
+            break;
+          }
+          break;
+        case SDLK_UP:
+          if (a > 0) a--; else a = 3;
+          break;
+        case SDLK_DOWN:
+          if (a < 3) a++; else a = 0;
+          break;
+        default:
+          break;
+        }
+      }
+    }
+  } while (!done);
 }

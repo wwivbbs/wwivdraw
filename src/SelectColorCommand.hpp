@@ -7,9 +7,9 @@ class MysticDrawMain;
 
 class SelectColorCommand : Command
 {
-	public:
-    SelectColorCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+public:
+  SelectColorCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 #endif

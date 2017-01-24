@@ -38,108 +38,109 @@ unsigned char RahmenAnsi[1400] = {
 72,223,72,223,72,223,72,254,72,223,72,254,72,223,72,223,72,223,72,223,72,223,72,32,72,32,7,220,8,0,
 7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,
 7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,0,7,196,8,196,8,196,8,196,
-8,196,8,196,8,196,8,196,8,196,8,196,8,196,8,220,8,220,8,220,8,220,8,220,8,220,8,223,8};
+8,196,8,196,8,196,8,196,8,196,8,196,8,196,8,220,8,220,8,220,8,220,8,220,8,220,8,223,8 };
 
 void SelectColorCommand::run()
 {
-	int Blink,x,a;
-	for (x=1;x<=1400;x++) {
-		if ((x%160<125)&&(x%160>2)) {
-			if (x%2==0) {
-				ansout << gotoxy(11+(x%160)/2, 15+x/160);
-				if (RahmenAnsi[x]==0) RahmenAnsi[x]=32;
-				ansout << RahmenAnsi[x];
-			} else ansout << textattr(RahmenAnsi[x]);
-		}
-	}
-	ansout << gotoxy(38, 21) << "B - BLINK";
-	ansout << gotoxy(19, 17) << textattr(15) << (char)176 << (char)176 << ' ';
-	for (a=1;a<=15;a++) {
-		ansout << textattr(a) << (char)219 << (char)219 << ' ';
-	}
-	ansout << gotoxy(30, 19) << textattr(15) << (char)176 << (char)176 << ' ';
-	for (a=1;a<=7;a++) {
-		ansout << textattr(a) << (char)219 << (char)219 << ' ';
-	}
-	x=19+((Attribute&15)*3);
-	Blink=Attribute&128;
-	SDL_Event event;
-	bool done = false;
-	do {
-		ansout << gotoxy(x, 16) << textattr(14) << (char)194 << (char)194;
-		ansout << gotoxy(x, 18) << textattr(14) << (char)193 << (char)193;
-		draw_main().updateColorStatus((Attribute&112)+(x-19)/3+Blink);
-		screenEngine.showScreen();
-		SDL_Delay(10);
-		ansout << textattr(14); 
-		ansout << gotoxy(x, 16) << ' ' << ' ';
-		ansout << gotoxy(x, 18) << ' ' << ' ';
-		while (SDL_PollEvent(&event)) {
-			switch (event.type){
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case 'b':
-							Blink = Blink ^ 128;
-							break;
-						case SDLK_LEFT:
-							x -= 3;
-							break;
-						case SDLK_RIGHT:
-							x += 3;
-							break;
-						case SDLK_RETURN:
-							done = true;
-							break;
-						default:
-							break;
-					}
-					break;
-			}
-		}
-		if (x>64) x=19;
-		if (x<19) x=64;
-	} while (!done);
-	a=(x-19)/3;
-	x=30+((Attribute & 112)>>4)*3;
-	
-	done = false;
-	do {
-		ansout << gotoxy(x, 18) << textattr(14) << (char)194 << (char)194;
-		ansout << gotoxy(x, 20) << (char)193 << (char)193;
-		draw_main().updateColorStatus(a+(((x-30)/3)<<4)+Blink);
-		screenEngine.showScreen();
-		SDL_Delay(10);
-		ansout << textattr(14);
-		ansout << gotoxy(x, 18) << ' ' << ' ';
-		ansout << gotoxy(x, 20) << ' ' << ' ';
-		while (SDL_PollEvent(&event)) {
-			switch (event.type){
-				case SDL_KEYDOWN:
-					switch (event.key.keysym.sym) {
-						case 'b':
-							Blink = Blink ^ 128;
-							break;
-						case SDLK_LEFT:
-							x-=3;
-							break;
-						case SDLK_RIGHT:
-							x+=3;
-							break;
-						case SDLK_RETURN:
-							done = true;
-							break;
-						default:
-							break;
-					}
-					break;
-			}
-		}
-		if (x > 51) {
-			x=30;
-		}
-		if (x < 30) {
-			x=51;
-		}
-	} while (!done);
-	Attribute = (a + (((x-30)/3)<<4) + Blink);
+  int Blink, x, a;
+  for (x = 1; x <= 1400; x++) {
+    if ((x % 160 < 125) && (x % 160 > 2)) {
+      if (x % 2 == 0) {
+        ansout << gotoxy(11 + (x % 160) / 2, 15 + x / 160);
+        if (RahmenAnsi[x] == 0) RahmenAnsi[x] = 32;
+        ansout << RahmenAnsi[x];
+      }
+      else ansout << textattr(RahmenAnsi[x]);
+    }
+  }
+  ansout << gotoxy(38, 21) << "B - BLINK";
+  ansout << gotoxy(19, 17) << textattr(15) << (char)176 << (char)176 << ' ';
+  for (a = 1; a <= 15; a++) {
+    ansout << textattr(a) << (char)219 << (char)219 << ' ';
+  }
+  ansout << gotoxy(30, 19) << textattr(15) << (char)176 << (char)176 << ' ';
+  for (a = 1; a <= 7; a++) {
+    ansout << textattr(a) << (char)219 << (char)219 << ' ';
+  }
+  x = 19 + ((Attribute & 15) * 3);
+  Blink = Attribute & 128;
+  SDL_Event event;
+  bool done = false;
+  do {
+    ansout << gotoxy(x, 16) << textattr(14) << (char)194 << (char)194;
+    ansout << gotoxy(x, 18) << textattr(14) << (char)193 << (char)193;
+    draw_main().updateColorStatus((Attribute & 112) + (x - 19) / 3 + Blink);
+    screenEngine.showScreen();
+    SDL_Delay(10);
+    ansout << textattr(14);
+    ansout << gotoxy(x, 16) << ' ' << ' ';
+    ansout << gotoxy(x, 18) << ' ' << ' ';
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case 'b':
+          Blink = Blink ^ 128;
+          break;
+        case SDLK_LEFT:
+          x -= 3;
+          break;
+        case SDLK_RIGHT:
+          x += 3;
+          break;
+        case SDLK_RETURN:
+          done = true;
+          break;
+        default:
+          break;
+        }
+        break;
+      }
+    }
+    if (x > 64) x = 19;
+    if (x < 19) x = 64;
+  } while (!done);
+  a = (x - 19) / 3;
+  x = 30 + ((Attribute & 112) >> 4) * 3;
+
+  done = false;
+  do {
+    ansout << gotoxy(x, 18) << textattr(14) << (char)194 << (char)194;
+    ansout << gotoxy(x, 20) << (char)193 << (char)193;
+    draw_main().updateColorStatus(a + (((x - 30) / 3) << 4) + Blink);
+    screenEngine.showScreen();
+    SDL_Delay(10);
+    ansout << textattr(14);
+    ansout << gotoxy(x, 18) << ' ' << ' ';
+    ansout << gotoxy(x, 20) << ' ' << ' ';
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case 'b':
+          Blink = Blink ^ 128;
+          break;
+        case SDLK_LEFT:
+          x -= 3;
+          break;
+        case SDLK_RIGHT:
+          x += 3;
+          break;
+        case SDLK_RETURN:
+          done = true;
+          break;
+        default:
+          break;
+        }
+        break;
+      }
+    }
+    if (x > 51) {
+      x = 30;
+    }
+    if (x < 30) {
+      x = 51;
+    }
+  } while (!done);
+  Attribute = (a + (((x - 30) / 3) << 4) + Blink);
 }

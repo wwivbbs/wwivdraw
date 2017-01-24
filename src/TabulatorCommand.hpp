@@ -7,9 +7,9 @@ class MysticDrawMain;
 
 class TabulatorSetupCommand : public Command
 {
-	public:
-    TabulatorSetupCommand(MysticDrawMain* win) : Command(win) {}
-		void run();
+public:
+  TabulatorSetupCommand(MysticDrawMain* win) : Command(win) {}
+  void run();
 };
 
 extern int getPrevTab(int caretPosition);

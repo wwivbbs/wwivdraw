@@ -44,13 +44,13 @@ extern unsigned char ActiveCharset;
 extern bool FullScreen;
 
 
-struct teffekt  {
-   int Effekt;
-   unsigned char colorTable[5][10];
-   unsigned char* getColorTable()
-   {
-	   return colorTable[Effekt];
-   }
+struct teffekt {
+  int Effekt;
+  unsigned char colorTable[5][10];
+  unsigned char* getColorTable()
+  {
+    return colorTable[Effekt];
+  }
 };
 
 extern teffekt effect;
@@ -58,78 +58,78 @@ extern teffekt effect;
 using namespace std;
 class MysticDrawMain
 {
-	private:
-		int    currentBuffer;
-		
-		bool   done;
-		ScreenBuffer** screen;
-		
-		Caret caret;
-		
-		const string getConfigurationFileName()
-		{
-#if WIN32
-			return "mdraw.config";
-#else
-			return string(getenv("HOME")) + "/.mdraw/mdraw.config";
-#endif		
-		}
-		
-		void loadconfig();
-		void saveconfig();
-		
-		void renderFontCharacter(char c);
-	public:
-		char** args;
+private:
+  int    currentBuffer;
 
-		static MysticDrawMain& getInstance();
-		
-		MysticDrawMain()
-		{
-			const int maxScreens = 4;
-			screen = new ScreenBuffer*[maxScreens];
-			for (int i = 0; i < maxScreens; ++i) {
-				screen[i] = new ScreenBuffer();
-			}
-			
-			currentBuffer = 0;
-		}
-		
-		ScreenBuffer* getCurrentBuffer()
-		{
-			return screen[currentBuffer];
-		}
-		
-		ScreenBuffer* getUndoBuffer()
-		{
-			return screen[3];
-		}
-		
-		int& getCurrentBufferNumber()
-		{
-			return currentBuffer;
-		}
-		
-		Caret& getCaret()
-		{
-			return caret;
-		}
-		
-		void startMysticDraw(int argnum, char* args[]);
-		void drawStatusLine();
-		void updateColorStatus(unsigned char color);
-		
-		void ClearMessageLine();
-		void drawScreen(int startLine, int endLine);
-		void typeCharacter(unsigned char ch);
-		char readCharacter();
-		
-		void exitMysticDraw();
-		
-		~MysticDrawMain()
-		{
-			delete [] screen;
-		}
+  bool   done;
+  ScreenBuffer** screen;
+
+  Caret caret;
+
+  const string getConfigurationFileName()
+  {
+#if WIN32
+    return "mdraw.config";
+#else
+    return string(getenv("HOME")) + "/.mdraw/mdraw.config";
+#endif		
+  }
+
+  void loadconfig();
+  void saveconfig();
+
+  void renderFontCharacter(char c);
+public:
+  char** args;
+
+  static MysticDrawMain& getInstance();
+
+  MysticDrawMain()
+  {
+    const int maxScreens = 4;
+    screen = new ScreenBuffer*[maxScreens];
+    for (int i = 0; i < maxScreens; ++i) {
+      screen[i] = new ScreenBuffer();
+    }
+
+    currentBuffer = 0;
+  }
+
+  ScreenBuffer* getCurrentBuffer()
+  {
+    return screen[currentBuffer];
+  }
+
+  ScreenBuffer* getUndoBuffer()
+  {
+    return screen[3];
+  }
+
+  int& getCurrentBufferNumber()
+  {
+    return currentBuffer;
+  }
+
+  Caret& getCaret()
+  {
+    return caret;
+  }
+
+  void startMysticDraw(int argnum, char* args[]);
+  void drawStatusLine();
+  void updateColorStatus(unsigned char color);
+
+  void ClearMessageLine();
+  void drawScreen(int startLine, int endLine);
+  void typeCharacter(unsigned char ch);
+  char readCharacter();
+
+  void exitMysticDraw();
+
+  ~MysticDrawMain()
+  {
+    delete[] screen;
+  }
 };
 
 

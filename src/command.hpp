@@ -6,11 +6,11 @@ class ScreenBuffer;
 class Caret;
 
 class Command {
-	public:
-    Command(MysticDrawMain* main);
-    virtual ~Command() {}
+public:
+  Command(MysticDrawMain* main);
+  virtual ~Command() {}
 
-		virtual void run() = 0;
+  virtual void run() = 0;
 
 protected:
   MysticDrawMain& draw_main() { return *main_; }
