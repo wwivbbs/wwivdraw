@@ -552,7 +552,7 @@ extern int chooser(int col, int first, ...)
 							done = true;
 							break;
 						default:
-							for (unsigned int i = 0; i <= optionList.size(); ++i) {
+							for (unsigned int i = 0; i < optionList.size(); ++i) {
 								if (toupper(event.key.keysym.sym) == keyboardShortcuts[i].second) {
 									return i + 1;
 								}

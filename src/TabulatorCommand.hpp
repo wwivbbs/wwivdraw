@@ -1,8 +1,7 @@
 #ifndef TABULATORCOMMAND__HPP
 #define TABULATORCOMMAND__HPP
 
-#include<MysticDrawMain.hpp>
-#include<command.hpp>
+#include "command.hpp"
 
 class MysticDrawMain;
 

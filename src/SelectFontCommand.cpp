@@ -1,4 +1,5 @@
 #include<SelectFontCommand.hpp>
+#include "mdraw.h"
 
 // class SelectOutlineCommand members
 unsigned char SelectAnsi[4096] = {

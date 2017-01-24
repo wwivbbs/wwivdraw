@@ -1,7 +1,7 @@
 #ifndef SELECTCOLORCOMMAND__HPP
 #define SELECTCOLORCOMMAND__HPP
 
-#include "MysticDrawMain.hpp"
+#include "command.hpp"
 
 class MysticDrawMain;
 

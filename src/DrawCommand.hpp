@@ -1,9 +1,8 @@
 #ifndef DRAWCOMMAND_HPP
 #define DRAWCOMMAND_HPP
 
-#include<command.hpp>
-#include<bio_crt.h>
-#include<MysticDrawMain.hpp>
+#include "command.hpp"
+#include "bio_crt.h"
 
 class DrawCommand : Command
 {

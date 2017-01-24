@@ -17,11 +17,12 @@
  * 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <memory>
 #include <string>
 #include <vector>
 #include <cerrno>
 #include "sauce.hpp"
-#include <MysticDrawMain.hpp>
+#include "mdraw.h"
 
 using namespace std;
 
@@ -93,51 +94,51 @@ void about()
   } while (true);
 }
 
-void ClearScreen()
+static void ClearScreen(MysticDrawMain& m, ScreenBuffer* screen)
 {
   int x;
-  MysticDrawMain::getInstance().ClearMessageLine();
+  m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
   CoolWrite("Clear Screen :");
   x = chooser(15, 1, "Yes", "No", 0);
   Undo = false;
   if (x == 1) {
-    MysticDrawMain::getInstance().getCurrentBuffer()->clear();
+    screen->clear();
   }
   SaveScreen();
 }
 
-void global() {
-  int x, ch;
-  MysticDrawMain::getInstance().ClearMessageLine();
+static void global(MysticDrawMain& m, ScreenBuffer* screen) {
+  int ch;
+  m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
   CoolWrite("Global :");
-  x = chooser(10, 1, "Fill", "Copy", "Text", "Abort", 0);
+  int x = chooser(10, 1, "Fill", "Copy", "Text", "Abort", 0);
   switch (x) {
   case 1:
-    MysticDrawMain::getInstance().ClearMessageLine();
+    m.ClearMessageLine();
     ansout << gotoxy(0, LINES - 1);
     CoolWrite("Fill :");
     x = chooser(8, 1, "Character", "aTribute", "Fore", "Back", "Abort", 0);
     switch (x) {
     case 1:
-      ch = MysticDrawMain::getInstance().readCharacter();
-      MysticDrawMain::getInstance().getCurrentBuffer()->fillCharacter(ch);
+      ch = m.readCharacter();
+      screen->fillCharacter(ch);
       break;
     case 2:
-      MysticDrawMain::getInstance().getCurrentBuffer()->fillAttribute(Attribute);
+      screen->fillAttribute(Attribute);
       break;
     case 3:
-      MysticDrawMain::getInstance().getCurrentBuffer()->fillForeColor(Attribute & 15);
+      screen->fillForeColor(Attribute & 15);
 
       break;
     case 4:
-      MysticDrawMain::getInstance().getCurrentBuffer()->fillBackColor(Attribute & 240);
+      screen->fillBackColor(Attribute & 240);
       break;
     }
     break;
   case 2:
-    MysticDrawMain::getInstance().ClearMessageLine();
+    m.ClearMessageLine();
     ansout << gotoxy(0, LINES - 1);
     CoolWrite("Copy to page :");
     switch (chooser(15, 1, "1", "2", "Abort", 0)) {
@@ -152,43 +153,43 @@ void global() {
     };
     break;
   case 3:
-    MysticDrawMain::getInstance().ClearMessageLine();
+    m.ClearMessageLine();
     ansout << gotoxy(0, LINES - 1);
     CoolWrite("Text :");
     switch (chooser(8, 1, "Left", "Right", "Center", "Elite", "eFfect", "Abort", 0)) {
     case 1:
-      MysticDrawMain::getInstance().getCurrentBuffer()->leftTrim();
+      screen->leftTrim();
       break;
     case 2:
-      MysticDrawMain::getInstance().getCurrentBuffer()->rightTrim();
+      screen->rightTrim();
       break;
     case 3:
-      MysticDrawMain::getInstance().getCurrentBuffer()->center();
+      screen->center();
       break;
     case 4:
-      MysticDrawMain::getInstance().getCurrentBuffer()->transformElite();
+      screen->transformElite();
       break;
     case 5:
-      MysticDrawMain::getInstance().getCurrentBuffer()->drawEffect(effect.Effekt, effect.getColorTable());
+      screen->drawEffect(effect.Effekt, effect.getColorTable());
       break;
     }
   }
 }
 
-void SetPage()
+void SetPage(MysticDrawMain& m)
 {
-  MysticDrawMain::getInstance().ClearMessageLine();
+  m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
   CoolWrite("Set Page :");
-  int i = chooser(12, MysticDrawMain::getInstance().getCurrentBufferNumber() + 1, "1", "2", 0);
+  int i = chooser(12, m.getCurrentBufferNumber() + 1, "1", "2", 0);
   if (i >= 1 && i <= 2) {
-    MysticDrawMain::getInstance().getCurrentBufferNumber() = i - 1;
+    m.getCurrentBufferNumber() = i - 1;
   }
 }
 
-void UndoLast() {
+void UndoLast(MysticDrawMain& m) {
   if (Undo) {
-    MysticDrawMain::getInstance().ClearMessageLine();
+    m.ClearMessageLine();
     ansout << gotoxy(0, LINES - 1);
     CoolWrite("Undo :");
     // TODO !!!
@@ -311,16 +312,16 @@ char *AnsiColor(unsigned char col) {
   return a;
 }
 
-int SelectSaveMode()
+static int SelectSaveMode(MysticDrawMain& m)
 {
-  MysticDrawMain::getInstance().ClearMessageLine();
+  m.ClearMessageLine();
   return chooser(16, 1, "Clearscreen", "Home", "None", 0);
 }
 
-char *EnterName(char *b) {
+static char *EnterName(MysticDrawMain& m, char *b) {
   char *a;
   char *ext;
-  MysticDrawMain::getInstance().ClearMessageLine();
+  m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
   CoolWrite("Enter Filename :");
   a = "";
@@ -331,35 +332,35 @@ char *EnterName(char *b) {
   return a;
 }
 
-int CharCount(int d, int e, int a, int chr) {
-  int b, c = 0;
-  for (b = d; b <= e; b++)
-    if ((MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(a, b) == chr)&(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) == MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, d))) c++; else break;
+static int CharCount(ScreenBuffer* screen, int d, int e, int a, int chr) {
+  int c = 0;
+  for (int b = d; b <= e; b++)
+    if ((screen->getCharacter(a, b) == chr)&(screen->getAttribute(a, b) == screen->getAttribute(a, d))) c++; else break;
   return c;
 }
 
-int Numberofchars(int a) {
-  int b, c = 0;
-  for (b = 0; b <= 79; b++)
-    if (((MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(a, b) != ' ') & (MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) != 0)
+static int Numberofchars(ScreenBuffer* screen, int a) {
+  int c = 0;
+  for (int b = 0; b <= 79; b++)
+    if (((screen->getCharacter(a, b) != ' ') & (screen->getAttribute(a, b) != 0)
       ) |
-      ((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(a, b) & 112) != 0)) c = b;
+      ((screen->getAttribute(a, b) & 112) != 0)) c = b;
   return c;
 }
 
-void save() {
+void save(MysticDrawMain& m, ScreenBuffer* screen) {
   char *Name, *s;
   FILE *fp;
   int x, y, z, chnum;
   oldColor = 0;
   ansout << gotoxy(0, LINES - 1);
   x = chooser(0, 1, "aNsi", "aVatar", "Pcboard", "aScii", "Binary", "C", "XBin", "Abort", 0);
-  int lastLine = MysticDrawMain::getInstance().getCurrentBuffer()->getLastNonEmptyLine();
+  int lastLine = screen->getLastNonEmptyLine();
   switch (x) {
   case 1: /*ANSI Save*/
-    Name = EnterName(".ans");
+    Name = EnterName(m, ".ans");
     fp = fopen(Name, "wb");
-    switch (SelectSaveMode()) {
+    switch (SelectSaveMode(m)) {
     case 1:
       fprintf(fp, "[2J");
       break;
@@ -368,38 +369,38 @@ void save() {
       break;
     }
     for (y = 0; y <= lastLine; y++) {
-      /*	if (y>0) if (Numberofchars(y-1)>=79) fprintf(fp,"[A");*/
-      chnum = Numberofchars(y);
+      /*	if (y>0) if (Numberofchars(screen, y-1)>=79) fprintf(fp,"[A");*/
+      chnum = Numberofchars(screen, y);
       for (x = 0; x <= chnum; x++) {
-        z = CharCount(x, chnum, y, ' ');
-        if ((z>2)&((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 112) == 0)) {
+        z = CharCount(screen, x, chnum, y, ' ');
+        if ((z>2)&((screen->getAttribute(y, x) & 112) == 0)) {
           fprintf(fp, "[%dC", z);
           x += z - 1;
         }
         else {
-          if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
-          s = AnsiColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+          if (screen->getCharacter(y, x) == 0) screen->getCharacter(y, x) = 32;
+          s = AnsiColor(screen->getAttribute(y, x));
           if (s != NULL) fprintf(fp, "%s", s);
-          fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+          fputc(screen->getCharacter(y, x), fp);
         }
       }
       fputc(13, fp);
       fputc(10, fp);
     }
     fprintf(fp, "[0m");
-    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 1;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    if (screen->doSaveSauce()) {
+      screen->getSauce().DataType = 1;
+      screen->getSauce().FileType = 1;
+      screen->getSauce().TInfo1 = 80;
+      screen->getSauce().TInfo2 = lastLine;
+      screen->getSauce().AppendSauce(fp);
     }
     fclose(fp);
     break;
   case 2: /*AVATAR Save*/
-    Name = EnterName(".avt");
+    Name = EnterName(m, ".avt");
     fp = fopen(Name, "wb");
-    switch (SelectSaveMode()) {
+    switch (SelectSaveMode(m)) {
     case 1:
       fputc('', fp);
       break;
@@ -408,36 +409,36 @@ void save() {
       break;
     }
     for (y = 0; y <= lastLine; y++) {
-      chnum = Numberofchars(y);
+      chnum = Numberofchars(screen, y);
       for (x = 0; x <= chnum; x++) {
-        z = CharCount(x, chnum, y, MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x));
-        s = AvatarColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+        z = CharCount(screen, x, chnum, y, screen->getCharacter(y, x));
+        s = AvatarColor(screen->getAttribute(y, x));
         if (s != NULL) fprintf(fp, "%s", s);
-        if ((z>2)&((MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 112) == 0)) {
-          fprintf(fp, "%c%c", MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), z);
+        if ((z>2)&((screen->getAttribute(y, x) & 112) == 0)) {
+          fprintf(fp, "%c%c", screen->getCharacter(y, x), z);
           x += z - 1;
         }
         else {
-          if (MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) == 0) fputc(0, fp);
-          if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
-          fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+          if (screen->getAttribute(y, x) == 0) fputc(0, fp);
+          if (screen->getCharacter(y, x) == 0) screen->getCharacter(y, x) = 32;
+          fputc(screen->getCharacter(y, x), fp);
         }
       }
       fputc(13, fp);
       fputc(10, fp);
     }
     fprintf(fp, "");
-    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 5;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    if (screen->doSaveSauce()) {
+      screen->getSauce().DataType = 1;
+      screen->getSauce().FileType = 5;
+      screen->getSauce().AppendSauce(fp);
     }
     fclose(fp);
     break;
   case 3:
-    Name = EnterName(".pcb");
+    Name = EnterName(m, ".pcb");
     fp = fopen(Name, "wb");
-    switch (SelectSaveMode()) {
+    switch (SelectSaveMode(m)) {
     case 1:
       fprintf(fp, "@CLS@");
       break;
@@ -446,64 +447,64 @@ void save() {
       break;
     }
     for (y = 0; y <= lastLine; y++) {
-      for (x = 0; x <= Numberofchars(y); x++) {
-        if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
-        s = PCBoardColor(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
+      for (x = 0; x <= Numberofchars(screen, y); x++) {
+        if (screen->getCharacter(y, x) == 0) screen->getCharacter(y, x) = 32;
+        s = PCBoardColor(screen->getAttribute(y, x));
         if (s != NULL) fprintf(fp, "%s", s);
-        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+        fputc(screen->getCharacter(y, x), fp);
       }
       fputc(13, fp);
       fputc(10, fp);
     }
-    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 4;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    if (screen->doSaveSauce()) {
+      screen->getSauce().DataType = 1;
+      screen->getSauce().FileType = 4;
+      screen->getSauce().TInfo1 = 80;
+      screen->getSauce().TInfo2 = lastLine;
+      screen->getSauce().AppendSauce(fp);
     }
     fclose(fp);
     break;
   case 4:
-    Name = EnterName(".asc");
+    Name = EnterName(m, ".asc");
     fp = fopen(Name, "wb");
     for (y = 0; y <= lastLine; y++) {
-      for (x = 0; x <= Numberofchars(y); x++) {
-        if (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) == 0) MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = 32;
-        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
+      for (x = 0; x <= Numberofchars(screen, y); x++) {
+        if (screen->getCharacter(y, x) == 0) screen->getCharacter(y, x) = 32;
+        fputc(screen->getCharacter(y, x), fp);
       }
       fputc(13, fp);
       fputc(10, fp);
     }
-    if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().DataType = 1;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().FileType = 0;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo1 = 80;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().TInfo2 = lastLine;
-      MysticDrawMain::getInstance().getCurrentBuffer()->getSauce().AppendSauce(fp);
+    if (screen->doSaveSauce()) {
+      screen->getSauce().DataType = 1;
+      screen->getSauce().FileType = 0;
+      screen->getSauce().TInfo1 = 80;
+      screen->getSauce().TInfo2 = lastLine;
+      screen->getSauce().AppendSauce(fp);
     }
     fclose(fp);
     break;
   case 5:
-    Name = EnterName(".bin");
+    Name = EnterName(m, ".bin");
     fp = fopen(Name, "wb");
     for (y = 0; y <= lastLine; y++) {
-      for (x = 0; x<MysticDrawMain::getInstance().getCurrentBuffer()->getWidth(); x++) {
-        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x), fp);
-        fputc(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x), fp);
+      for (x = 0; x<screen->getWidth(); x++) {
+        fputc(screen->getCharacter(y, x), fp);
+        fputc(screen->getAttribute(y, x), fp);
       }
     }
     fclose(fp);
     break;
   case 6:
-    Name = EnterName(" ");
+    Name = EnterName(m, " ");
     fp = fopen(Name, "wb");
     fprintf(fp, "unsigned char %s[%d]={\n", Name, (lastLine + 1) * 160);
     for (y = 0; y <= lastLine; y++) {
-      for (x = 0; x<MysticDrawMain::getInstance().getCurrentBuffer()->getWidth(); x++) {
-        fprintf(fp, "%d,%d", MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x),
-          MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x));
-        if (x + 1 <MysticDrawMain::getInstance().getCurrentBuffer()->getWidth()) fputc(',', fp);
+      for (x = 0; x<screen->getWidth(); x++) {
+        fprintf(fp, "%d,%d", screen->getCharacter(y, x),
+          screen->getAttribute(y, x));
+        if (x + 1 <screen->getWidth()) fputc(',', fp);
       }
       if (y<lastLine) fputc(',', fp); else fprintf(fp, "};");
       fputc(13, fp);
@@ -512,8 +513,8 @@ void save() {
     fclose(fp);
     break;
   case 7:
-    Name = EnterName(" ");
-    MysticDrawMain::getInstance().getCurrentBuffer()->save(Name, XBinary);
+    Name = EnterName(m, " ");
+    screen->save(Name, XBinary);
     break;
   }
 }
@@ -736,8 +737,7 @@ struct FileDescriptor
   string group;
 };
 
-void load()
-{
+static void load() {
   // TODO(rushfan): Fix this *** BROKEN ***
 #if 0
   vector<FileDescriptor> files;
@@ -843,7 +843,7 @@ void load()
             readnew = 1;
           }
           else {
-            MysticDrawMain::getInstance().getCurrentBuffer()->load((char*)files[y + z].name.c_str());
+            screen->load((char*)files[y + z].name.c_str());
             done = true;
           }
           break;
@@ -895,8 +895,7 @@ unsigned char ActiveMenue = 1, MaxItem;
 char * MenueItem[20], Length;
 int MouseX, MouseY;
 
-int Menues(int x, int y)
-{
+static int Menues(Caret& caret, int x, int y) {
   int a, b, c, d;
   DrawBox(x, y, x + Length + 1, y + MaxItem + 1);
   b = 1;
@@ -927,10 +926,10 @@ int Menues(int x, int y)
       Gpm_DrawPointer(mouse_x + 1, mouse_y + 1, 1);
 #endif
     if (FullScreen) {
-      ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 0);
+      ansout << gotoxy(caret.getX(), caret.getY() + 0);
     }
     else {
-      ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 1);
+      ansout << gotoxy(caret.getX(), caret.getY() + 1);
     }
 
 #ifdef HAS_GPM
@@ -1025,7 +1024,7 @@ int Menues(int x, int y)
     return 255;
 }
 
-int menue()
+int menue(MysticDrawMain& m, Caret& caret)
 {
   int x, a, b;
   b = 0;
@@ -1040,10 +1039,10 @@ int menue()
       a = 0;
       if (ActiveMenue != b) {
         if (FullScreen) {
-          MysticDrawMain::getInstance().drawScreen(1, 25);
+          m.drawScreen(1, 25);
         }
         else {
-          MysticDrawMain::getInstance().drawScreen(1, 24);
+          m.drawScreen(1, 24);
         }
         ansout << gotoxy(0, 0) << textattr(8);
         ansout << (char)223;
@@ -1084,7 +1083,7 @@ int menue()
         MenueItem[3] = " QUIT       ALT+X  ";
         Length = 18;
         MaxItem = 3;
-        a = Menues(0, 2);
+        a = Menues(caret, 0, 2);
         break;
       case 2:
         MenueItem[1] = " SELECT FONT    ALT+F  ";
@@ -1092,7 +1091,7 @@ int menue()
         MenueItem[3] = " OUTLINE TYPE   ALT+W  ";
         Length = 22;
         MaxItem = 3;
-        a = Menues(12, 2);
+        a = Menues(caret, 12, 2);
         break;
       case 3:
         MenueItem[1] = " SAUCE SETUP   CTRL+S ";
@@ -1102,7 +1101,7 @@ int menue()
         MenueItem[5] = " SET EFFECT    ALT+M  ";
         Length = 20;
         MaxItem = 5;
-        a = Menues(25, 2);
+        a = Menues(caret, 25, 2);
         break;
       case 4:
         MenueItem[1] = " CLEAR PAGE    ALT+C  ";
@@ -1113,7 +1112,7 @@ int menue()
         MenueItem[6] = " UNDO/RESTORE  ALT+R  ";
         Length = 21;
         MaxItem = 6;
-        a = Menues(38, 2);
+        a = Menues(caret, 38, 2);
         break;
       case 5:
         MenueItem[1] = " SET COLORS    ALT+A  ";
@@ -1121,7 +1120,7 @@ int menue()
         MenueItem[3] = " ASCII TABLE   ALT+K  ";
         Length = 21;
         MaxItem = 3;
-        a = Menues(50, 2);
+        a = Menues(caret, 50, 2);
         break;
       case 6:
         MenueItem[1] = " LINE DRAW        ALT+D  ";
@@ -1131,14 +1130,14 @@ int menue()
         MenueItem[5] = " ELITE MODE       ALT+E  ";
         Length = 24;
         MaxItem = 5;
-        a = Menues(53, 2);
+        a = Menues(caret, 53, 2);
         break;
       case 7:
         MenueItem[1] = " HELP         ALT+H  ";
         MenueItem[2] = " ABOUT               ";
         Length = 20;
         MaxItem = 2;
-        a = Menues(56, 2);
+        a = Menues(caret, 56, 2);
         break;
       };
       switch (a) {
@@ -1164,20 +1163,21 @@ int menue()
       return a + (ActiveMenue << 8);
 }
 
-void menuemode()
-{
-  unsigned int a = 0;
-  a = menue();
-  HelpCommand           helpCommand(&MysticDrawMain::getInstance());
-  ASCIITableCommand     asciiTableCommand(&MysticDrawMain::getInstance());
-  TabulatorSetupCommand tabulatorSetupCommand(&MysticDrawMain::getInstance());
-  SelectFontCommand     selectFontCommand(&MysticDrawMain::getInstance());
-  SelectOutlineCommand  selectOutlineCommand(&MysticDrawMain::getInstance());
-  SelectSauceCommand    selectSauceCommand(&MysticDrawMain::getInstance());
-  DrawCommand           drawCommand(&MysticDrawMain::getInstance());
-  DrawLineCommand       drawLineCommand(&MysticDrawMain::getInstance());
-  SelectEffectModeCommand   selectEffectCommand(&MysticDrawMain::getInstance());
-  SelectColorCommand selectColorCommand(&MysticDrawMain::getInstance());
+void menuemode(MysticDrawMain& m) {
+  auto screen = m.getCurrentBuffer();
+  auto caret = m.getCaret();
+  HelpCommand           helpCommand(&m);
+  ASCIITableCommand     asciiTableCommand(&m);
+  TabulatorSetupCommand tabulatorSetupCommand(&m);
+  SelectFontCommand     selectFontCommand(&m);
+  SelectOutlineCommand  selectOutlineCommand(&m);
+  SelectSauceCommand    selectSauceCommand(&m);
+  DrawCommand           drawCommand(&m);
+  DrawLineCommand       drawLineCommand(&m);
+  SelectEffectModeCommand   selectEffectCommand(&m);
+  SelectColorCommand selectColorCommand(&m);
+
+  unsigned int a = menue(m, caret);
 
   switch ((a & 0xFF00) >> 8) {
   case 1:
@@ -1186,10 +1186,10 @@ void menuemode()
       load();
       break;
     case 2:
-      save();
+      save(m, screen);
       break;
     case 3:
-      MysticDrawMain::getInstance().exitMysticDraw();
+      m.exitMysticDraw();
       break;
     }
     break;
@@ -1199,7 +1199,7 @@ void menuemode()
       selectFontCommand.run();
       break;
     case 2:
-      MysticDrawMain::getInstance().getCaret().fontMode() = !MysticDrawMain::getInstance().getCaret().fontMode();
+      caret.fontMode() = !caret.fontMode();
       Undo = false;
       SaveScreen();
       break;
@@ -1214,13 +1214,13 @@ void menuemode()
       selectSauceCommand.run();
       break;
     case 2:
-      SetPage();
+      SetPage(m);
       break;
     case 3:
       tabulatorSetupCommand.run();
       break;
     case 4:
-      global();
+      global(m, screen);
       break;
     case 5:
       selectEffectCommand.run();
@@ -1230,22 +1230,22 @@ void menuemode()
   case 4:
     switch (a & 0xFF) {
     case 1:
-      ClearScreen();
+      ClearScreen(m, screen);
       break;
     case 2:
-      MysticDrawMain::getInstance().getCurrentBuffer()->insertLine(MysticDrawMain::getInstance().getCaret().getLogicalY());
+      screen->insertLine(caret.getLogicalY());
       break;
     case 3:
-      MysticDrawMain::getInstance().getCurrentBuffer()->removeLine(MysticDrawMain::getInstance().getCaret().getLogicalY());
+      screen->removeLine(caret.getLogicalY());
       break;
     case 4:
-      MysticDrawMain::getInstance().getCurrentBuffer()->insertColumn(MysticDrawMain::getInstance().getCaret().getX());
+      screen->insertColumn(caret.getX());
       break;
     case 5:
-      MysticDrawMain::getInstance().getCurrentBuffer()->removeColumn(MysticDrawMain::getInstance().getCaret().getX());
+      screen->removeColumn(caret.getX());
       break;
     case 6:
-      UndoLast();
+      UndoLast(m);
       break;
     }
     break;
@@ -1255,7 +1255,7 @@ void menuemode()
       selectColorCommand.run();
       break;
     case 2:
-      Attribute = MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(MysticDrawMain::getInstance().getCaret().getLogicalY(), MysticDrawMain::getInstance().getCaret().getX());
+      Attribute = screen->getAttribute(caret.getLogicalY(), caret.getX());
       break;
     case 3:
       asciiTableCommand.run();
@@ -1271,7 +1271,7 @@ void menuemode()
       drawCommand.run();
       break;
     case 3:
-      MysticDrawMain::getInstance().getCaret().insertMode() = !MysticDrawMain::getInstance().getCaret().insertMode();
+      caret.insertMode() = !caret.insertMode();
       break;
 #ifdef HAS_SVGALIB
     case 4:
@@ -1279,7 +1279,7 @@ void menuemode()
       break;
 #endif
     case 5:
-      MysticDrawMain::getInstance().getCaret().eliteMode() = !MysticDrawMain::getInstance().getCaret().eliteMode();
+      caret.eliteMode() = !caret.eliteMode();
       break;
     }
   case 7:
@@ -1293,59 +1293,6 @@ void menuemode()
     }
     break;
   }
-}
-
-void Caret::checkCaretPosition()
-{
-	if (caretY < 0) {
-		caretY = 0;
-		--upperLeftCornerLine;
-	}
-	if (caretX < 0) {
-		caretX = 0;
-		--upperLeftCornerRow;
-	}
-	
-	if (FullScreen) {       
-		if (caretY > LINES - 1) {
-			caretY = LINES - 1;
-			++upperLeftCornerLine;
-		}
-		if (upperLeftCornerLine + LINES > MysticDrawMain::getInstance().getCurrentBuffer()->getHeight()) {
-			upperLeftCornerLine = MysticDrawMain::getInstance().getCurrentBuffer()->getHeight() - LINES;
-		}
-	} else {
-		if (caretY > LINES - 2) {
-			caretY = LINES - 2;
-			++upperLeftCornerLine;
-		}
-		if (upperLeftCornerLine + LINES - 1 > MysticDrawMain::getInstance().getCurrentBuffer()->getHeight()) {
-			upperLeftCornerLine = MysticDrawMain::getInstance().getCurrentBuffer()->getHeight() - LINES + 1;
-		}
-	}
-	
-	if (caretX >= COLS) {
-		upperLeftCornerRow += caretX - COLS  + 1;
-		caretX = COLS - 1;
-	}
-	
-	if (upperLeftCornerRow + 80 > MysticDrawMain::getInstance().getCurrentBuffer()->getWidth()) {
-		upperLeftCornerRow = MysticDrawMain::getInstance().getCurrentBuffer()->getWidth() - 80;
-	}
-	
-	upperLeftCornerLine = max(upperLeftCornerLine, 0);
-	upperLeftCornerRow  = max(upperLeftCornerRow,  0);
-	
-	caretX = max(caretX, 0);
-	caretX = min(caretX, 79);
-}
-
-
-MysticDrawMain MysticDrawMain::mysticDrawMain;
-
-MysticDrawMain& MysticDrawMain::getInstance()
-{
-  return mysticDrawMain;
 }
 
 void MysticDrawMain::drawStatusLine()
@@ -1484,21 +1431,23 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 #endif
 	screenEngine.LoadFont(args);
 	
-  HelpCommand           helpCommand(&MysticDrawMain::getInstance());
-	ASCIITableCommand     asciiTableCommand(&MysticDrawMain::getInstance());
-	TabulatorSetupCommand tabulatorSetupCommand(&MysticDrawMain::getInstance());
-	SelectFontCommand     selectFontCommand(&MysticDrawMain::getInstance());
-	SelectOutlineCommand  selectOutlineCommand(&MysticDrawMain::getInstance());
-	SelectSauceCommand    selectSauceCommand(&MysticDrawMain::getInstance());
-	DrawCommand           drawCommand(&MysticDrawMain::getInstance());
-	DrawLineCommand       drawLineCommand(&MysticDrawMain::getInstance());
-	SelectEffectModeCommand   selectEffectCommand(&MysticDrawMain::getInstance());
-	SelectColorCommand selectColorCommand(&MysticDrawMain::getInstance());
-	BlockModeCommand     blockModeCommand(&MysticDrawMain::getInstance());
-	FontEditorCommand    fontEditorCommand(&MysticDrawMain::getInstance());
-	PaletteEditorCommand paletteEditorCommand(&MysticDrawMain::getInstance());
-	ViewModeCommand      viewModeCommand(&MysticDrawMain::getInstance());
-	SDL_Event event;
+  auto buf = this->getCurrentBuffer();
+  auto& c = this->getCaret();
+  HelpCommand           helpCommand(this);
+  ASCIITableCommand     asciiTableCommand(this);
+  TabulatorSetupCommand tabulatorSetupCommand(this);
+  SelectFontCommand     selectFontCommand(this);
+  SelectOutlineCommand  selectOutlineCommand(this);
+  SelectSauceCommand    selectSauceCommand(this);
+  DrawCommand           drawCommand(this);
+  DrawLineCommand       drawLineCommand(this);
+  SelectEffectModeCommand   selectEffectCommand(this);
+  SelectColorCommand selectColorCommand(this);
+  BlockModeCommand     blockModeCommand(this, buf, &c);
+  FontEditorCommand    fontEditorCommand(this);
+  PaletteEditorCommand paletteEditorCommand(this);
+  ViewModeCommand      viewModeCommand(this);
+  SDL_Event event;
 	
 	done = false;
 	do {
@@ -1533,7 +1482,7 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 					done = true;
 					break;
 				case SDL_KEYDOWN:
-					caret.handleKeyStroke(&event);
+					caret.handleKeyStroke(&event, *buf);
 					if (event.key.keysym.mod & KMOD_CTRL) {
 						switch (event.key.keysym.sym) {
 							case 's':
@@ -1567,10 +1516,10 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 								viewModeCommand.run();
 								break;
 							case 'r': /* ALT+R UNDO*/
-								UndoLast();
+								UndoLast(*this);
 								break;
 							case 'g':
-								global();
+								global(*this, buf);
 								break;
 							case 'u': /* ALT+U PiCKUP COLOR*/
 								Attribute = getCurrentBuffer()->getAttribute(caret.getLogicalY(), caret.getLogicalX());
@@ -1599,16 +1548,16 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 								SaveScreen();
 								break;
 							case 's':
-								save();
+								save(*this, buf);
 								break;
 							case 'c': /* ALT+C - ClearScreen*/
-								ClearScreen();
+								ClearScreen(*this, buf);
 								break;
 							case 'l':
 								load();
 								break;
 							case 'p': /* ALT+P - SetPage */
-								SetPage();
+								SetPage(*this);
 								break;
 							case 't':
 								tabulatorSetupCommand.run();
@@ -1674,7 +1623,7 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 								FullScreen = !FullScreen;
 								break;
 							case SDLK_ESCAPE:
-								menuemode();
+								menuemode(*this);
 								break;
 							case SDLK_TAB:
 								// TODO:
@@ -1752,7 +1701,7 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
 					}
 			}
 		}
-		caret.checkCaretPosition();
+		caret.checkCaretPosition(*buf);
 	} while (!done);
 }
 
@@ -1875,7 +1824,7 @@ char MysticDrawMain::readCharacter()
 {
 	int ch = 512;
 	SDL_Event event;
-	MysticDrawMain::getInstance().ClearMessageLine();
+	this->ClearMessageLine();
 	cout << gotoxy(0, LINES - 1);
 	
 	CoolWrite("Enter Character :");
@@ -1898,7 +1847,7 @@ char MysticDrawMain::readCharacter()
 
 void MysticDrawMain::exitMysticDraw()
 {
-	MysticDrawMain::getInstance().ClearMessageLine();
+	this->ClearMessageLine();
 	cout << gotoxy(0, LINES - 1);
 	CoolWrite("Sure ? ");
 	switch(chooser(8, 2, "Yes", "No", 0)){
@@ -1924,11 +1873,16 @@ extern "C" FILE * __cdecl __iob_func(void)
 
 int main(int argnum,char *args[]) 
 {
-  auto md = new MysticDrawMain();
-  md->startMysticDraw(argnum, args);
-  delete md;
+  {
+    auto md = std::make_unique<MysticDrawMain>();
+    md->startMysticDraw(argnum, args);
+  }
   
   cout << "Thank you for using Mystic Draw" << endl;
-  exit(0);
+
+  // Calling exit(0) was cashing a crash. Something static
+  // is crashing in the destructor and I can't get a stack
+  // trace on windows.
+  _exit(0);
   return 0;
 }

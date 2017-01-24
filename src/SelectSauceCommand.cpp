@@ -1,4 +1,5 @@
 #include<SelectSauceCommand.hpp>
+#include "mdraw.h"
 
 unsigned char SauceAnsi[4096] = {
 32,7,32,7,32,7,0,7,0,7,0,7,0,7,0,7,0,7,223,8,32,
@@ -207,6 +208,10 @@ unsigned char SauceAnsi[4096] = {
 0,142,6,56,0,38,161,2,0,163,32,0,199,6,42,0,214,0,140,14,
 44,0,191,84,3,190,57,2,185,19,0,144,252,46,172};
 
+
+SelectSauceCommand::SelectSauceCommand(MysticDrawMain* win)
+  : Command(win), screen_buffer_(win->getCurrentBuffer()) {}
+
 void SelectSauceCommand::run()
 {
 	char *nul;
@@ -223,7 +228,7 @@ void SelectSauceCommand::run()
 		}
 	}
 	
-	Sauce* sauce = &MysticDrawMain::getInstance().getCurrentBuffer()->getSauce();
+	Sauce* sauce = &screen_buffer_->getSauce();
 	
 	bool done = false;
 	SDL_Event event;
@@ -241,13 +246,13 @@ void SelectSauceCommand::run()
 		ansout << textattr(7);
 		for (b=strlen((const char*)sauce->Group);b<20;b++) ansout << (char)250;
 		ansout << gotoxy(40, 8) << textattr(15);
-		if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+		if (screen_buffer_->doSaveSauce()) {
 			ansout << 'x';
 		} else {
 			ansout << ' ';
 		}
 		ansout << gotoxy(49, 8);
-		if (MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce()) {
+		if (screen_buffer_->doSaveSauce()) {
 			ansout << ' '; 
 		} else {
 			ansout << 'x';
@@ -269,7 +274,7 @@ void SelectSauceCommand::run()
 						case SDLK_RETURN:
 							switch(a) {
 								case 0:
-									MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce() = !MysticDrawMain::getInstance().getCurrentBuffer()->doSaveSauce();
+                  screen_buffer_->doSaveSauce() = !screen_buffer_->doSaveSauce();
 									break;
 								case 1:
 									nul = inputfield((char*)sauce->Title,35,28,10);

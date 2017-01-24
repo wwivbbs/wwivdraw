@@ -1,4 +1,5 @@
 #include<ViewModeCommand.hpp>
+#include "mdraw.h"
 
 void ViewModeCommand::putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
@@ -37,8 +38,8 @@ void ViewModeCommand::run()
 	SDL_Event event;
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	
-	int width  = MysticDrawMain::getInstance().getCurrentBuffer()->getWidth();
-	int height = MysticDrawMain::getInstance().getCurrentBuffer()->getHeight();
+	int width  = screen_buffer().getWidth();
+	int height = screen_buffer().getHeight();
 	Uint8* palette = screenEngine.getPalette();
 	do {
 		SDL_Delay(200);
@@ -48,13 +49,13 @@ void ViewModeCommand::run()
 				for (int x = 0; x < width; ++x) {
 					if (y < height) {
 					
-						int back = (MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 240) >> 4;
-						int fore = MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) & 15;
+						int back = (screen_buffer().getAttribute(y, x) & 240) >> 4;
+						int fore = screen_buffer().getAttribute(y, x) & 15;
 						
 						Uint32 pixel1;
 						Uint32 pixel2;
 						
-						switch (MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x)) {
+						switch (screen_buffer().getCharacter(y, x)) {
 							case 0:
 							case ' ':
 							case 255:

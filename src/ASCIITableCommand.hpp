@@ -3,7 +3,6 @@
 
 #include<bio_crt.h>
 #include<command.hpp>
-#include<MysticDrawMain.hpp>
 
 class MysticDrawMain;
 

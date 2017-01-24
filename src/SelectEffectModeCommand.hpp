@@ -2,7 +2,7 @@
 #define EFFECTMODECOMMAND__HPP
 
 #include<command.hpp>
-#include<MysticDrawMain.hpp>
+#include "mdraw.h"
 
 class MysticDrawMain;
 

@@ -1,5 +1,5 @@
 #include<HelpCommand.hpp>
-#include<MysticDrawMain.hpp>
+#include "mdraw.h"
 
 const int  help_lines = 54;
 char* online_help[] = {

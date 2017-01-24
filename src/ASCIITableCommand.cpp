@@ -1,4 +1,5 @@
-#include<ASCIITableCommand.hpp>
+#include "ASCIITableCommand.hpp"
+#include "mdraw.h"
 
 unsigned char ASCIITableCommand::show_ASCIITable()
 {
@@ -85,5 +86,5 @@ unsigned char ASCIITableCommand::show_ASCIITable()
 
 void ASCIITableCommand::run()
 {
-	MysticDrawMain::getInstance().typeCharacter(show_ASCIITable());
+	draw_main().typeCharacter(show_ASCIITable());
 }

@@ -1,4 +1,5 @@
 #include<SelectColorCommand.hpp>
+#include "mdraw.h"
 
 unsigned char RahmenAnsi[1400] = {
 32,7,32,8,32,8,223,8,32,8,219,4,220,72,254,8,220,72,254,8,220,72,220,72,220,72,220,72,220,72,220,
@@ -67,7 +68,7 @@ void SelectColorCommand::run()
 	do {
 		ansout << gotoxy(x, 16) << textattr(14) << (char)194 << (char)194;
 		ansout << gotoxy(x, 18) << textattr(14) << (char)193 << (char)193;
-		MysticDrawMain::getInstance().updateColorStatus((Attribute&112)+(x-19)/3+Blink);
+		draw_main().updateColorStatus((Attribute&112)+(x-19)/3+Blink);
 		screenEngine.showScreen();
 		SDL_Delay(10);
 		ansout << textattr(14); 
@@ -105,7 +106,7 @@ void SelectColorCommand::run()
 	do {
 		ansout << gotoxy(x, 18) << textattr(14) << (char)194 << (char)194;
 		ansout << gotoxy(x, 20) << (char)193 << (char)193;
-		MysticDrawMain::getInstance().updateColorStatus(a+(((x-30)/3)<<4)+Blink);
+		draw_main().updateColorStatus(a+(((x-30)/3)<<4)+Blink);
 		screenEngine.showScreen();
 		SDL_Delay(10);
 		ansout << textattr(14);

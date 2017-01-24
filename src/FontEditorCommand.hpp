@@ -1,12 +1,11 @@
 #ifndef FONTEDITORCOMMAND__HPP
-#define FONTEDITORCOMMANDP__HPP
-#include <bio_crt.h>
+#define FONTEDITORCOMMAND__HPP
 #include <command.hpp>
+#include <bio_crt.h>
 
 class MysticDrawMain;
 
-class FontEditorCommand : public Command
-{
+class FontEditorCommand : public Command {
 	private:
 		char cursorX;
 		char cursorY;

@@ -1,4 +1,5 @@
-#include<BlockModeCommand.hpp>
+#include "BlockModeCommand.hpp"
+#include "mdraw.h"
 
 void BlockModeCommand::CopyBlock(char Mode)
 {
@@ -9,14 +10,14 @@ void BlockModeCommand::CopyBlock(char Mode)
 	ymax+=(LINES-25);
 	//SaveScreen();
 	Undo = true;
-	MysticDrawMain::getInstance().ClearMessageLine();
+	draw_main().ClearMessageLine();
 	ansout << gotoxy(0, LINES - 1);
 	CodeWrite("[S]tamp [P]age [U]nder [X]/[Y] Flip [RETURN] [ESC]");
 	
-	ScreenBlock screenBlock = MysticDrawMain::getInstance().getCurrentBuffer()->getBlock(X1, Y1, X2, Y2);
+	ScreenBlock screenBlock = screen_buffer().getBlock(X1, Y1, X2, Y2);
 	
 	if (Mode == 2) {
-		MysticDrawMain::getInstance().getCurrentBuffer()->clear(X1, Y1, X2, Y2);
+		screen_buffer().clear(X1, Y1, X2, Y2);
 	}
 	
 	SDL_Event event;
@@ -25,8 +26,8 @@ void BlockModeCommand::CopyBlock(char Mode)
 		if (FullScreen)  ansout << gotoxy(0, 0); else  ansout << gotoxy(0, 1);  
 		for (y=0;y<=ymax;y++) {	 
 			for (x=0;x<=79;x++){
-				ansout << textattr(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine(), x + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerRow()));
-				c = MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine(), x  + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerRow());
+				ansout << textattr(screen_buffer().getAttribute(y + caret().getUpperLeftCornerLine(), x + caret().getUpperLeftCornerRow()));
+				c = screen_buffer().getCharacter(y + caret().getUpperLeftCornerLine(), x  + caret().getUpperLeftCornerRow());
 				if (c >= ' ') {
 					ansout << c;
 				} else {
@@ -39,19 +40,19 @@ void BlockModeCommand::CopyBlock(char Mode)
 		}
 		
 		for (y = Y1; y <= Y2 ;y++) {	 
-			if (MysticDrawMain::getInstance().getCaret().getY()+(y-Y1)<ymax+1) {
+			if (caret().getY()+(y-Y1)<ymax+1) {
 				if (FullScreen) {
-					ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY()+(y-Y1));
+					ansout << gotoxy(caret().getX(), caret().getY()+(y-Y1));
 				} else {
-					ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY()+(y-Y1)+1);
+					ansout << gotoxy(caret().getX(), caret().getY()+(y-Y1)+1);
 				}
 				for (x=X1;x<=X2;x++) { 
-					if (MysticDrawMain::getInstance().getCaret().getX()+(x-X1)<80)
+					if (caret().getX()+(x-X1)<80)
 					{
 						ansout << textattr(screenBlock.getAttribute(y - Y1, x - X1));
 						c=screenBlock.getCharacter(y - Y1, x - X1);		
 						if (under) {
-							d=MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(MysticDrawMain::getInstance().getCaret().getLogicalY()+(y-Y1), MysticDrawMain::getInstance().getCaret().getLogicalX()+(x-X1));
+							d=screen_buffer().getCharacter(caret().getLogicalY()+(y-Y1), caret().getLogicalX()+(x-X1));
 							if ((d==32)|(d==0)) {
 								if (c >= ' ') {
 									ansout << c;
@@ -59,7 +60,7 @@ void BlockModeCommand::CopyBlock(char Mode)
 									ansout << ' ';
 								}
 							} else {
-								ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX()+(x-X1)+1, MysticDrawMain::getInstance().getCaret().getY()+(y-Y1)+1);
+								ansout << gotoxy(caret().getX()+(x-X1)+1, caret().getY()+(y-Y1)+1);
 							}
 						} else { 
 							if (c >= ' ') {
@@ -72,16 +73,16 @@ void BlockModeCommand::CopyBlock(char Mode)
 				}
 			}
 			if (COLS>80) {
-				ansout << gotoxy(0, MysticDrawMain::getInstance().getCaret().getY()+(y-Y1));
+				ansout << gotoxy(0, caret().getY()+(y-Y1));
 			}
 		}
 		
-		MysticDrawMain::getInstance().drawStatusLine();
-		MysticDrawMain::getInstance().updateColorStatus(Attribute);
+		draw_main().drawStatusLine();
+		draw_main().updateColorStatus(Attribute);
 		if (FullScreen) {
-			ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY());
+			ansout << gotoxy(caret().getX(), caret().getY());
 		} else {
-			ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 1);
+			ansout << gotoxy(caret().getX(), caret().getY() + 1);
 		}
 #ifdef HAS_GPM
 		if (MouseSupport)   {
@@ -100,11 +101,11 @@ void BlockModeCommand::CopyBlock(char Mode)
 								done = true;
 								break;
 							case SDLK_RETURN:
-								MysticDrawMain::getInstance().getCurrentBuffer()->stampBlock(screenBlock, MysticDrawMain::getInstance().getCaret().getLogicalX(), MysticDrawMain::getInstance().getCaret().getLogicalY(), under);
+								screen_buffer().stampBlock(screenBlock, caret().getLogicalX(), caret().getLogicalY(), under);
 								done = true;
 								break;
 							default:
-								MysticDrawMain::getInstance().getCaret().handleKeyStroke(&event);
+								caret().handleKeyStroke(&event, screen_buffer());
 								switch (event.key.keysym.unicode) {
 									case 'y':
 										screenBlock.flipY();
@@ -120,7 +121,7 @@ void BlockModeCommand::CopyBlock(char Mode)
 										//if (++ActivePage>2) ActivePage=1;
 										break;
 									case 's':
-										MysticDrawMain::getInstance().getCurrentBuffer()->stampBlock(screenBlock, MysticDrawMain::getInstance().getCaret().getLogicalX(), MysticDrawMain::getInstance().getCaret().getLogicalY(), under);
+										screen_buffer().stampBlock(screenBlock, caret().getLogicalX(), caret().getLogicalY(), under);
 										break;
 								}
 								break;
@@ -130,11 +131,11 @@ void BlockModeCommand::CopyBlock(char Mode)
 			}
 		}
 		
-		if (MysticDrawMain::getInstance().getCaret().getY()>ymax) {
-			MysticDrawMain::getInstance().getCaret().getY()=ymax;
-			MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine()++;
+		if (caret().getY()>ymax) {
+			caret().getY()=ymax;
+			caret().getUpperLeftCornerLine()++;
 		}
-		MysticDrawMain::getInstance().getCaret().checkCaretPosition();
+		caret().checkCaretPosition(screen_buffer());
 	} while (!done);
 	
 #ifdef HAS_GPM
@@ -153,9 +154,9 @@ void BlockModeCommand::run()
 	int x,y,maxy=22;
 	if (FullScreen) maxy++;
 	maxy+=LINES-25;
-	MysticDrawMain::getInstance().ClearMessageLine();
-	x1=MysticDrawMain::getInstance().getCaret().getLogicalX();
-	y1=MysticDrawMain::getInstance().getCaret().getLogicalY();
+	draw_main().ClearMessageLine();
+	x1=caret().getLogicalX();
+	y1=caret().getLogicalY();
 	
 	SDL_Event event;
 	bool done = false;
@@ -167,31 +168,31 @@ void BlockModeCommand::run()
 			ansout << gotoxy(0, 1);
 		}
 		
-		if (MysticDrawMain::getInstance().getCaret().getLogicalY()>y1){
+		if (caret().getLogicalY()>y1){
 			Y1=y1;
-			Y2=MysticDrawMain::getInstance().getCaret().getLogicalY();
+			Y2=caret().getLogicalY();
 		} else {
 			Y2=y1;
-			Y1=MysticDrawMain::getInstance().getCaret().getLogicalY();
+			Y1=caret().getLogicalY();
 		}
 		
-		if (MysticDrawMain::getInstance().getCaret().getLogicalX()>x1) {
+		if (caret().getLogicalX()>x1) {
 			X1=x1;
-			X2=MysticDrawMain::getInstance().getCaret().getLogicalX();
+			X2=caret().getLogicalX();
 		} else {
 			X2=x1;
-			X1=MysticDrawMain::getInstance().getCaret().getLogicalX();	 
+			X1=caret().getLogicalX();	 
 		}
 		
 		for (y=0;y<=maxy;y++) {
 			for (x=0;x<=79;x++) {
-				if ((x + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerRow()>=X1)&(x + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerRow()<=X2)&(y+MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine()>=Y1)&(y+MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine()<=Y2)) {
+				if ((x + caret().getUpperLeftCornerRow()>=X1)&(x + caret().getUpperLeftCornerRow()<=X2)&(y+caret().getUpperLeftCornerLine()>=Y1)&(y+caret().getUpperLeftCornerLine()<=Y2)) {
 					ansout << textattr(112);
 				} else {
-					ansout << textattr(MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine(), x));
+					ansout << textattr(screen_buffer().getAttribute(y + caret().getUpperLeftCornerLine(), x));
 				}
 				
-				unsigned char c = MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine(), x + MysticDrawMain::getInstance().getCaret().getUpperLeftCornerRow());
+				unsigned char c = screen_buffer().getCharacter(y + caret().getUpperLeftCornerLine(), x + caret().getUpperLeftCornerRow());
 				if (c >= ' ') {
 					ansout << c; 
 				} else {
@@ -203,15 +204,15 @@ void BlockModeCommand::run()
 			}
 		}
 		
-		MysticDrawMain::getInstance().drawStatusLine();
-		MysticDrawMain::getInstance().updateColorStatus(Attribute);
+		draw_main().drawStatusLine();
+		draw_main().updateColorStatus(Attribute);
 		ansout << gotoxy(0, LINES - 1);
 		CodeWrite("[C]opy [M]ove [F]ill [E]rase [D]elete [O]utline [T]ext [ESC]");
 		
 		if (FullScreen) {
-			ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY());
+			ansout << gotoxy(caret().getX(), caret().getY());
 		} else {
-			ansout << gotoxy(MysticDrawMain::getInstance().getCaret().getX(), MysticDrawMain::getInstance().getCaret().getY() + 1);
+			ansout << gotoxy(caret().getX(), caret().getY() + 1);
 		}
 		screenEngine.showScreen();
 		SDL_Delay(10);
@@ -223,7 +224,7 @@ void BlockModeCommand::run()
 								done = true;
 								break;
 							default:
-								MysticDrawMain::getInstance().getCaret().handleKeyStroke(&event);
+								caret().handleKeyStroke(&event, screen_buffer());
 								switch (event.key.keysym.unicode) {
 									case 'm':
 										CopyBlock(2);
@@ -234,87 +235,87 @@ void BlockModeCommand::run()
 										done = true;
 										break;
 									case 'e': // ERASE BLOCK 
-										MysticDrawMain::getInstance().getCurrentBuffer()->clear(X1, Y1, X2, Y2);
+										screen_buffer().clear(X1, Y1, X2, Y2);
 										done = true;
 										break;
 									case 'd': // DELETE BLOCK 
-										MysticDrawMain::getInstance().getCurrentBuffer()->clear(X1, Y1, X2, Y2);
+										screen_buffer().clear(X1, Y1, X2, Y2);
 										for (y=Y1;y<=Y2;y++) {
 											for (x = X2; x < 80; x++) {
-												MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x - (X2 - X1)) = MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x);
-												MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x - (X2 - X1)) = MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x);
+												screen_buffer().getCharacter(y, x - (X2 - X1)) = screen_buffer().getCharacter(y, x);
+												screen_buffer().getAttribute(y, x - (X2 - X1)) = screen_buffer().getAttribute(y, x);
 											}
 											for (x = 79 - (X2 - X1); x <= 79; ++x) {
-												MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, x) = ' ';
-												MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, x) = 7;
+												screen_buffer().getCharacter(y, x) = ' ';
+												screen_buffer().getAttribute(y, x) = 7;
 											}
 										}
 										done = true;
 										break;
 									case 'o': // OUTLINE
 										for (y = Y1; y <= Y2; ++y) {
-											MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, X1) = CharSet[ActiveCharset][5];
-											MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, X1) = Attribute;
-											MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(y, X2) = CharSet[ActiveCharset][5];
-											MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(y, X2) = Attribute;
+											screen_buffer().getCharacter(y, X1) = CharSet[ActiveCharset][5];
+											screen_buffer().getAttribute(y, X1) = Attribute;
+											screen_buffer().getCharacter(y, X2) = CharSet[ActiveCharset][5];
+											screen_buffer().getAttribute(y, X2) = Attribute;
 										}
 										for (x = X1; x <= X2; x++) {
-											MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y1, x) = CharSet[ActiveCharset][4];
-											MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(Y1, x) = Attribute;
-											MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y2, x) = CharSet[ActiveCharset][4];
-											MysticDrawMain::getInstance().getCurrentBuffer()->getAttribute(Y2, x) = Attribute;
+											screen_buffer().getCharacter(Y1, x) = CharSet[ActiveCharset][4];
+											screen_buffer().getAttribute(Y1, x) = Attribute;
+											screen_buffer().getCharacter(Y2, x) = CharSet[ActiveCharset][4];
+											screen_buffer().getAttribute(Y2, x) = Attribute;
 										}
-										MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y1, X1) = CharSet[ActiveCharset][0];
-										MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y1, X2) = CharSet[ActiveCharset][1];
-										MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y2, X1) = CharSet[ActiveCharset][2];
-										MysticDrawMain::getInstance().getCurrentBuffer()->getCharacter(Y2, X2) = CharSet[ActiveCharset][3];
+										screen_buffer().getCharacter(Y1, X1) = CharSet[ActiveCharset][0];
+										screen_buffer().getCharacter(Y1, X2) = CharSet[ActiveCharset][1];
+										screen_buffer().getCharacter(Y2, X1) = CharSet[ActiveCharset][2];
+										screen_buffer().getCharacter(Y2, X2) = CharSet[ActiveCharset][3];
 										done = true;
 										break;
 									case 't': // TEXT
-										MysticDrawMain::getInstance().ClearMessageLine();
+										draw_main().ClearMessageLine();
 										ansout << gotoxy(0, LINES - 1);
 										switch (chooser(0, 1, "Left", "Center", "Right", "Elite", "eFfect", "Abort", 0)) {
 											case 1:
-												MysticDrawMain::getInstance().getCurrentBuffer()->leftTrim(X1, Y1, X2, Y2);
+												screen_buffer().leftTrim(X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 2:
-												MysticDrawMain::getInstance().getCurrentBuffer()->center(X1, Y1, X2, Y2);
+												screen_buffer().center(X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 3:
-												MysticDrawMain::getInstance().getCurrentBuffer()->rightTrim(X1, Y1, X2, Y2);
+												screen_buffer().rightTrim(X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 4:
-												MysticDrawMain::getInstance().getCurrentBuffer()->transformElite(X1, Y1, X2, Y2);
+												screen_buffer().transformElite(X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 5:
-												MysticDrawMain::getInstance().getCurrentBuffer()->drawEffect(X1, Y1, X2, Y2, effect.Effekt, effect.getColorTable());
+												screen_buffer().drawEffect(X1, Y1, X2, Y2, effect.Effekt, effect.getColorTable());
 												done = true;
 												break;
 										}
 										break;
 									case 'f': // FiLL 
-										MysticDrawMain::getInstance().ClearMessageLine();
+										draw_main().ClearMessageLine();
 										ansout << gotoxy(0, LINES - 1);
 										switch (chooser(0, 1, "Character", "Attribute", "Fore", "Back" , "Abort", 0)) {
 											case 1:
-												ch = MysticDrawMain::getInstance().readCharacter();
-												MysticDrawMain::getInstance().getCurrentBuffer()->fillCharacter(ch, X1, Y1, X2, Y2);
+												ch = draw_main().readCharacter();
+												screen_buffer().fillCharacter(ch, X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 2:
-												MysticDrawMain::getInstance().getCurrentBuffer()->fillAttribute(Attribute, X1, Y1, X2, Y2);
+												screen_buffer().fillAttribute(Attribute, X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 3:
-												MysticDrawMain::getInstance().getCurrentBuffer()->fillForeColor(Attribute & 15, X1, Y1, X2, Y2);
+												screen_buffer().fillForeColor(Attribute & 15, X1, Y1, X2, Y2);
 												done = true;
 												break;
 											case 4:
-												MysticDrawMain::getInstance().getCurrentBuffer()->fillBackColor(Attribute & 240, X1, Y1, X2, Y2);
+												screen_buffer().fillBackColor(Attribute & 240, X1, Y1, X2, Y2);
 												done = true;
 												break;
 										}
@@ -328,10 +329,10 @@ void BlockModeCommand::run()
 					break;
 			}
 		}
-		if (MysticDrawMain::getInstance().getCaret().getY()>maxy) {
-			MysticDrawMain::getInstance().getCaret().getY()=maxy;
-			MysticDrawMain::getInstance().getCaret().getUpperLeftCornerLine()++;
+		if (caret().getY()>maxy) {
+			caret().getY()=maxy;
+			caret().getUpperLeftCornerLine()++;
 		}
-		MysticDrawMain::getInstance().getCaret().checkCaretPosition();
+		caret().checkCaretPosition(screen_buffer());
 	} while (!done);
 }

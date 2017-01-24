@@ -1,7 +1,10 @@
 #ifndef VIEWMODE_HPP
 #define VIEWMODE_HPP
 
-#include<MysticDrawMain.hpp>
+#include "command.hpp"
+#include "bio_crt.h"
+
+class MysticDrawMain;
 
 class ViewModeCommand : public Command
 {

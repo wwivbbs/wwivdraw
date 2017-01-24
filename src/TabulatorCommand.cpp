@@ -1,4 +1,5 @@
 #include<TabulatorCommand.hpp>
+#include "mdraw.h"
 
 int getNextTab(int caretPosition)
 {
@@ -24,7 +25,7 @@ void TabulatorSetupCommand::run()
 {
 	int x = 0, ax;
 	char * str="";
-	MysticDrawMain::getInstance().ClearMessageLine();
+	draw_main().ClearMessageLine();
 	ansout << gotoxy(0, LINES - 1);
 	CodeWrite("[<]/[>] Move Cursor [S]et/Clear [R]eset [E]rase [I]ncrement [ESC]");
 	bool done = false;

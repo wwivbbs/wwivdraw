@@ -59,7 +59,6 @@ using namespace std;
 class MysticDrawMain
 {
 	private:
-		static MysticDrawMain mysticDrawMain;
 		int    currentBuffer;
 		
 		bool   done;
