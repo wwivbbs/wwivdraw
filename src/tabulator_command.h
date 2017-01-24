@@ -1,14 +1,14 @@
 #ifndef TABULATORCOMMAND__HPP
 #define TABULATORCOMMAND__HPP
 
-#include "command.hpp"
+#include "command.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class TabulatorSetupCommand : public Command
 {
 public:
-  TabulatorSetupCommand(MysticDrawMain* win) : Command(win) {}
+  TabulatorSetupCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 

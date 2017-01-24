@@ -5,10 +5,10 @@
 #include <cmath>
 
 #include "bio_crt.h"
-#include "command.hpp"
+#include "command.h"
 #include "fonts.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class SelectOutlineCommand : public Command
 {
@@ -16,7 +16,7 @@ private:
   void setunderground(int Underg, int b);
 
 public:
-  SelectOutlineCommand(MysticDrawMain* win) : Command(win) {}
+  SelectOutlineCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 
@@ -27,7 +27,7 @@ private:
   void showPreviewCharacter(int fontNumber);
 
 public:
-  SelectFontCommand(MysticDrawMain* win) : Command(win) {}
+  SelectFontCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 

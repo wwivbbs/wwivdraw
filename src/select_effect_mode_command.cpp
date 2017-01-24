@@ -1,4 +1,4 @@
-#include<SelectEffectModeCommand.hpp>
+#include "select_effect_mode_command.h"
 #include "mdraw.h"
 
 void SelectEffectModeCommand::draweffekt(int effekt, char *blabla, int highlite)

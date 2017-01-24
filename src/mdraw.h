@@ -1,9 +1,9 @@
 #ifndef MYSTICDRAWMAIN__HPP
 #define MYSTICDRAWMAIN__HPP
 
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstring>
+#include <cstdlib>
 #include <sys/types.h> 
 #include <fstream>
 #include <iostream>
@@ -14,21 +14,21 @@
 #include "bio_crt.h"
 #include "caret.h"
 
-#include "ScreenBuffer.hpp"
-#include "command.hpp"
-#include "HelpCommand.hpp"
-#include "ASCIITableCommand.hpp"
-#include "TabulatorCommand.hpp"
-#include "SelectFontCommand.hpp"
-#include "SelectSauceCommand.hpp"
-#include "SelectEffectModeCommand.hpp"
-#include "SelectColorCommand.hpp"
-#include "FontEditorCommand.hpp"
-#include "PaletteEditorCommand.hpp"
-#include "BlockModeCommand.hpp"
-#include "DrawCommand.hpp"
-#include "ViewModeCommand.hpp"
-#include "sauce.hpp"
+#include "screen_buffer.h"
+#include "command.h"
+#include "help_command.h"
+#include "ascii_table_command.h"
+#include "tabulator_command.h"
+#include "select_font_command.h"
+#include "select_sauce_command.h"
+#include "select_effect_mode_command.h"
+#include "select_color_command.h"
+#include "font_editor_command.h"
+#include "palette_editor_command.h"
+#include "block_mode_command.h"
+#include "draw_command.h"
+#include "view_mode_command.h"
+#include "sauce.h"
 #include "fonts.h"
 
 #define UNDOPage 0
@@ -47,17 +47,14 @@ extern bool FullScreen;
 struct teffekt {
   int Effekt;
   unsigned char colorTable[5][10];
-  unsigned char* getColorTable()
-  {
+  unsigned char* getColorTable() {
     return colorTable[Effekt];
   }
 };
 
 extern teffekt effect;
 
-using namespace std;
-class MysticDrawMain
-{
+class WWIVDrawMain {
 private:
   int    currentBuffer;
 
@@ -66,12 +63,12 @@ private:
 
   Caret caret;
 
-  const string getConfigurationFileName()
+  const std::string getConfigurationFileName()
   {
 #if WIN32
     return "mdraw.config";
 #else
-    return string(getenv("HOME")) + "/.mdraw/mdraw.config";
+    return std::string(getenv("HOME")) + "/.mdraw/mdraw.config";
 #endif		
   }
 
@@ -82,40 +79,21 @@ private:
 public:
   char** args;
 
-  static MysticDrawMain& getInstance();
-
-  MysticDrawMain()
-  {
-    const int maxScreens = 4;
+  WWIVDrawMain() {
+    constexpr int maxScreens = 4;
     screen = new ScreenBuffer*[maxScreens];
-    for (int i = 0; i < maxScreens; ++i) {
+    for (auto i = 0; i < maxScreens; ++i) {
       screen[i] = new ScreenBuffer();
     }
-
     currentBuffer = 0;
   }
 
-  ScreenBuffer* getCurrentBuffer()
-  {
-    return screen[currentBuffer];
-  }
+  ScreenBuffer* getCurrentBuffer() { return screen[currentBuffer]; }
+  ScreenBuffer* getUndoBuffer() { return screen[3]; }
+  int& getCurrentBufferNumber() { return currentBuffer; }
+  Caret& getCaret() { return caret; }
 
-  ScreenBuffer* getUndoBuffer()
-  {
-    return screen[3];
-  }
-
-  int& getCurrentBufferNumber()
-  {
-    return currentBuffer;
-  }
-
-  Caret& getCaret()
-  {
-    return caret;
-  }
-
-  void startMysticDraw(int argnum, char* args[]);
+  void start(int argnum, char* args[]);
   void drawStatusLine();
   void updateColorStatus(unsigned char color);
 
@@ -124,10 +102,9 @@ public:
   void typeCharacter(unsigned char ch);
   char readCharacter();
 
-  void exitMysticDraw();
+  void exit();
 
-  ~MysticDrawMain()
-  {
+  ~WWIVDrawMain() {
     delete[] screen;
   }
 };

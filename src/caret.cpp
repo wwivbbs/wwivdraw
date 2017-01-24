@@ -2,7 +2,7 @@
 #include "mdraw.h"
 
 #include "bio_crt.h"
-#include "ScreenBuffer.hpp"
+#include "screen_buffer.h"
 
 // From mdraw.h
 

@@ -1,4 +1,4 @@
-#include<DrawCommand.hpp>
+#include "draw_command.h"
 #include "mdraw.h"
 
 void DrawCommand::selectDrawMode()

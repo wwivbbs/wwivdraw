@@ -1,4 +1,4 @@
-#include<HelpCommand.hpp>
+#include "help_command.h"
 #include "mdraw.h"
 
 const int  help_lines = 54;

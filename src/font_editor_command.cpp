@@ -1,4 +1,4 @@
-#include "FontEditorCommand.hpp"
+#include "font_editor_command.h"
 #include "mdraw.h"
 
 unsigned char fonteditorAnsi[4000]={

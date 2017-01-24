@@ -1,17 +1,17 @@
 #ifndef ASCII_TABLE__HPP
 #define ASCII_TABLE__HPP
 
-#include<bio_crt.h>
-#include<command.hpp>
+#include "bio_crt.h"
+#include "command.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class ASCIITableCommand : public Command
 {
 private:
   unsigned char show_ASCIITable();
 public:
-  ASCIITableCommand(MysticDrawMain* win) : Command(win) {}
+  ASCIITableCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 

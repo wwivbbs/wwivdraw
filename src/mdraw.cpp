@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include <cerrno>
-#include "sauce.hpp"
+#include "sauce.h"
 #include "mdraw.h"
 
 using namespace std;
@@ -94,7 +94,7 @@ void about()
   } while (true);
 }
 
-static void ClearScreen(MysticDrawMain& m, ScreenBuffer* screen)
+static void ClearScreen(WWIVDrawMain& m, ScreenBuffer* screen)
 {
   int x;
   m.ClearMessageLine();
@@ -108,7 +108,7 @@ static void ClearScreen(MysticDrawMain& m, ScreenBuffer* screen)
   SaveScreen();
 }
 
-static void global(MysticDrawMain& m, ScreenBuffer* screen) {
+static void global(WWIVDrawMain& m, ScreenBuffer* screen) {
   int ch;
   m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
@@ -176,7 +176,7 @@ static void global(MysticDrawMain& m, ScreenBuffer* screen) {
   }
 }
 
-void SetPage(MysticDrawMain& m)
+void SetPage(WWIVDrawMain& m)
 {
   m.ClearMessageLine();
   ansout << gotoxy(0, LINES - 1);
@@ -187,7 +187,7 @@ void SetPage(MysticDrawMain& m)
   }
 }
 
-void UndoLast(MysticDrawMain& m) {
+void UndoLast(WWIVDrawMain& m) {
   if (Undo) {
     m.ClearMessageLine();
     ansout << gotoxy(0, LINES - 1);
@@ -312,13 +312,13 @@ char *AnsiColor(unsigned char col) {
   return a;
 }
 
-static int SelectSaveMode(MysticDrawMain& m)
+static int SelectSaveMode(WWIVDrawMain& m)
 {
   m.ClearMessageLine();
   return chooser(16, 1, "Clearscreen", "Home", "None", 0);
 }
 
-static char *EnterName(MysticDrawMain& m, char *b) {
+static char *EnterName(WWIVDrawMain& m, char *b) {
   char *a;
   char *ext;
   m.ClearMessageLine();
@@ -348,7 +348,7 @@ static int Numberofchars(ScreenBuffer* screen, int a) {
   return c;
 }
 
-void save(MysticDrawMain& m, ScreenBuffer* screen) {
+void save(WWIVDrawMain& m, ScreenBuffer* screen) {
   char *Name, *s;
   FILE *fp;
   int x, y, z, chnum;
@@ -1024,7 +1024,7 @@ static int Menues(Caret& caret, int x, int y) {
     return 255;
 }
 
-int menue(MysticDrawMain& m, Caret& caret)
+int menue(WWIVDrawMain& m, Caret& caret)
 {
   int x, a, b;
   b = 0;
@@ -1163,7 +1163,7 @@ int menue(MysticDrawMain& m, Caret& caret)
       return a + (ActiveMenue << 8);
 }
 
-void menuemode(MysticDrawMain& m) {
+void menuemode(WWIVDrawMain& m) {
   auto screen = m.getCurrentBuffer();
   auto caret = m.getCaret();
   HelpCommand           helpCommand(&m);
@@ -1189,7 +1189,7 @@ void menuemode(MysticDrawMain& m) {
       save(m, screen);
       break;
     case 3:
-      m.exitMysticDraw();
+      m.exit();
       break;
     }
     break;
@@ -1295,7 +1295,7 @@ void menuemode(MysticDrawMain& m) {
   }
 }
 
-void MysticDrawMain::drawStatusLine()
+void WWIVDrawMain::drawStatusLine()
 {
   if (FullScreen) {
     return;
@@ -1334,7 +1334,7 @@ void MysticDrawMain::drawStatusLine()
   ansout << textattr(7) << ' ';
 }
 
-void MysticDrawMain::updateColorStatus(unsigned char col)
+void WWIVDrawMain::updateColorStatus(unsigned char col)
 {
   if (FullScreen) {
     return;
@@ -1350,7 +1350,7 @@ void MysticDrawMain::updateColorStatus(unsigned char col)
  * Outline        1 Byte
  * EffectStruct   1 teffekt
 */
-void MysticDrawMain::loadconfig()
+void WWIVDrawMain::loadconfig()
 {
   FILE* fp = fopen(getConfigurationFileName().c_str(), "rb");
   if (fp != NULL) {
@@ -1376,7 +1376,7 @@ void MysticDrawMain::loadconfig()
   }
 }
 
-void MysticDrawMain::saveconfig()
+void WWIVDrawMain::saveconfig()
 {
   int ver = 2;
   FILE* fp = fopen(getConfigurationFileName().c_str(), "wb");
@@ -1399,7 +1399,7 @@ void MysticDrawMain::saveconfig()
   }
 }
 
-void MysticDrawMain::startMysticDraw(int argnum, char* args[])
+void WWIVDrawMain::start(int argnum, char* args[])
 {
   this->args = args;
   int a, b;
@@ -1544,7 +1544,7 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
             caret.eliteMode() = !caret.eliteMode();
             break;
           case 'x': /* ALT+X - Exit */
-            exitMysticDraw();
+            exit();
             break;
           case 'a': /* ALT+A - Color */
             selectColorCommand.run();
@@ -1718,7 +1718,7 @@ void MysticDrawMain::startMysticDraw(int argnum, char* args[])
   } while (!done);
 }
 
-void MysticDrawMain::ClearMessageLine()
+void WWIVDrawMain::ClearMessageLine()
 {
   ansout << gotoxy(0, LINES - 1) << textattr(7);
   for (int i = 0; i < 80; ++i) {
@@ -1726,7 +1726,7 @@ void MysticDrawMain::ClearMessageLine()
   }
 }
 
-void MysticDrawMain::renderFontCharacter(char c)
+void WWIVDrawMain::renderFontCharacter(char c)
 {
   FontLibrary* fl = &FontLibrary::getInstance();
 
@@ -1768,7 +1768,7 @@ void MysticDrawMain::renderFontCharacter(char c)
   getCaret().getX() += fl->maxX + fl->getCurrentFont()->spaces - 1;
 }
 
-void MysticDrawMain::drawScreen(int startLine, int endLine)
+void WWIVDrawMain::drawScreen(int startLine, int endLine)
 {
   unsigned char oldColor = 7;
   cout << gotoxy(0, startLine);
@@ -1818,7 +1818,7 @@ void MysticDrawMain::drawScreen(int startLine, int endLine)
   }
 }
 
-void MysticDrawMain::typeCharacter(unsigned char ch)
+void WWIVDrawMain::typeCharacter(unsigned char ch)
 {
   if (ch < ' ') {
     return;
@@ -1837,7 +1837,7 @@ void MysticDrawMain::typeCharacter(unsigned char ch)
   ++getCaret().getX();
 }
 
-char MysticDrawMain::readCharacter()
+char WWIVDrawMain::readCharacter()
 {
   int ch = 512;
   SDL_Event event;
@@ -1862,7 +1862,7 @@ char MysticDrawMain::readCharacter()
 }
 
 
-void MysticDrawMain::exitMysticDraw()
+void WWIVDrawMain::exit()
 {
   this->ClearMessageLine();
   cout << gotoxy(0, LINES - 1);
@@ -1891,8 +1891,8 @@ extern "C" FILE * __cdecl __iob_func(void)
 int main(int argnum, char *args[])
 {
   {
-    auto md = std::make_unique<MysticDrawMain>();
-    md->startMysticDraw(argnum, args);
+    auto md = std::make_unique<WWIVDrawMain>();
+    md->start(argnum, args);
   }
 
   cout << "Thank you for using Mystic Draw" << endl;

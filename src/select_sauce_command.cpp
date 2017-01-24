@@ -1,4 +1,4 @@
-#include<SelectSauceCommand.hpp>
+#include "select_sauce_command.h"
 #include "mdraw.h"
 
 unsigned char SauceAnsi[4096] = {
@@ -209,7 +209,7 @@ unsigned char SauceAnsi[4096] = {
 44,0,191,84,3,190,57,2,185,19,0,144,252,46,172 };
 
 
-SelectSauceCommand::SelectSauceCommand(MysticDrawMain* win)
+SelectSauceCommand::SelectSauceCommand(WWIVDrawMain* win)
   : Command(win), screen_buffer_(win->getCurrentBuffer()) {}
 
 void SelectSauceCommand::run()

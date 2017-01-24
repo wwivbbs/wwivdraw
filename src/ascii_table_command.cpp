@@ -1,4 +1,4 @@
-#include "ASCIITableCommand.hpp"
+#include "ascii_table_command.h"
 #include "mdraw.h"
 
 unsigned char ASCIITableCommand::show_ASCIITable()

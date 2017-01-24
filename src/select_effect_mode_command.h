@@ -1,10 +1,10 @@
 #ifndef EFFECTMODECOMMAND__HPP
 #define EFFECTMODECOMMAND__HPP
 
-#include<command.hpp>
+#include "command.h"
 #include "mdraw.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class SelectEffectModeCommand : public Command
 {
@@ -12,7 +12,7 @@ private:
   void draweffekt(int effekt, char *blabla, int highlite);
   void changecolor(int Effekt);
 public:
-  SelectEffectModeCommand(MysticDrawMain* win) : Command(win) {}
+  SelectEffectModeCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 

@@ -2,16 +2,16 @@
 #define BLOCKMODECOMMAND__HHP
 
 #include <algorithm>
-#include "command.hpp"
+#include "command.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 class ScreenBuffer;
 class Caret;
 
 class BlockModeCommand : public Command
 {
 public:
-  BlockModeCommand(MysticDrawMain* win, ScreenBuffer* screen_buffer, Caret* caret)
+  BlockModeCommand(WWIVDrawMain* win, ScreenBuffer* screen_buffer, Caret* caret)
     : Command(win) {}
   void run();
 

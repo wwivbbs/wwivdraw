@@ -1,4 +1,4 @@
-#include "BlockModeCommand.hpp"
+#include "block_mode_command.h"
 #include "mdraw.h"
 
 void BlockModeCommand::CopyBlock(char Mode)

@@ -1,4 +1,4 @@
-#include<ViewModeCommand.hpp>
+#include "view_mode_command.h"
 #include "mdraw.h"
 
 void ViewModeCommand::putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)

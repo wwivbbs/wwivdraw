@@ -18,6 +18,48 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ascii_table_command.h" />
+    <ClInclude Include="bio_crt.h" />
+    <ClInclude Include="block_mode_command.h" />
+    <ClInclude Include="caret.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="draw_command.h" />
+    <ClInclude Include="fonts.h" />
+    <ClInclude Include="font_editor_command.h" />
+    <ClInclude Include="help_command.h" />
+    <ClInclude Include="mdraw.h" />
+    <ClInclude Include="palette_editor_command.h" />
+    <ClInclude Include="sauce.h" />
+    <ClInclude Include="screen_buffer.h" />
+    <ClInclude Include="select_color_command.h" />
+    <ClInclude Include="select_effect_mode_command.h" />
+    <ClInclude Include="select_font_command.h" />
+    <ClInclude Include="select_sauce_command.h" />
+    <ClInclude Include="tabulator_command.h" />
+    <ClInclude Include="view_mode_command.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ascii_table_command.cpp" />
+    <ClCompile Include="bio_crt.cpp" />
+    <ClCompile Include="block_mode_command.cpp" />
+    <ClCompile Include="caret.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="draw_command.cpp" />
+    <ClCompile Include="fonts.cpp" />
+    <ClCompile Include="font_editor_command.cpp" />
+    <ClCompile Include="help_command.cpp" />
+    <ClCompile Include="mdraw.cpp" />
+    <ClCompile Include="palette_editor_command.cpp" />
+    <ClCompile Include="sauce.cpp" />
+    <ClCompile Include="screen_buffer.cpp" />
+    <ClCompile Include="select_color_command.cpp" />
+    <ClCompile Include="select_effect_mode_command.cpp" />
+    <ClCompile Include="select_font_command.cpp" />
+    <ClCompile Include="select_sauce_command.cpp" />
+    <ClCompile Include="tabulator_command.cpp" />
+    <ClCompile Include="view_mode_command.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{882C5190-DFA2-47FC-8F46-2964938F8590}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -71,7 +113,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -86,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -100,48 +142,6 @@
       <AdditionalDependencies>$(ProjectDir)..\deps\sdl\lib\x86\SDLmain.lib;$(ProjectDir)..\deps\sdl\lib\x86\SDL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="ASCIITableCommand.cpp" />
-    <ClCompile Include="bio_crt.cpp" />
-    <ClCompile Include="BlockModeCommand.cpp" />
-    <ClCompile Include="caret.cpp" />
-    <ClCompile Include="command.cpp" />
-    <ClCompile Include="DrawCommand.cpp" />
-    <ClCompile Include="FontEditorCommand.cpp" />
-    <ClCompile Include="fonts.cpp" />
-    <ClCompile Include="HelpCommand.cpp" />
-    <ClCompile Include="mdraw.cpp" />
-    <ClCompile Include="PaletteEditorCommand.cpp" />
-    <ClCompile Include="sauce.cpp" />
-    <ClCompile Include="ScreenBuffer.cpp" />
-    <ClCompile Include="SelectColorCommand.cpp" />
-    <ClCompile Include="SelectEffectModeCommand.cpp" />
-    <ClCompile Include="SelectFontCommand.cpp" />
-    <ClCompile Include="SelectSauceCommand.cpp" />
-    <ClCompile Include="TabulatorCommand.cpp" />
-    <ClCompile Include="ViewModeCommand.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ASCIITableCommand.hpp" />
-    <ClInclude Include="bio_crt.h" />
-    <ClInclude Include="BlockModeCommand.hpp" />
-    <ClInclude Include="caret.h" />
-    <ClInclude Include="command.hpp" />
-    <ClInclude Include="DrawCommand.hpp" />
-    <ClInclude Include="FontEditorCommand.hpp" />
-    <ClInclude Include="fonts.h" />
-    <ClInclude Include="HelpCommand.hpp" />
-    <ClInclude Include="mdraw.h" />
-    <ClInclude Include="PaletteEditorCommand.hpp" />
-    <ClInclude Include="sauce.hpp" />
-    <ClInclude Include="ScreenBuffer.hpp" />
-    <ClInclude Include="SelectColorCommand.hpp" />
-    <ClInclude Include="SelectEffectModeCommand.hpp" />
-    <ClInclude Include="SelectFontCommand.hpp" />
-    <ClInclude Include="SelectSauceCommand.hpp" />
-    <ClInclude Include="TabulatorCommand.hpp" />
-    <ClInclude Include="ViewModeCommand.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

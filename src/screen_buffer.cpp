@@ -1,4 +1,4 @@
-#include<ScreenBuffer.hpp>
+#include "screen_buffer.h"
 
 // only used internally as default 
 // buffer format (can be changed online, no need

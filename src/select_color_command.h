@@ -1,14 +1,14 @@
 #ifndef SELECTCOLORCOMMAND__HPP
 #define SELECTCOLORCOMMAND__HPP
 
-#include "command.hpp"
+#include "command.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class SelectColorCommand : Command
 {
 public:
-  SelectColorCommand(MysticDrawMain* win) : Command(win) {}
+  SelectColorCommand(WWIVDrawMain* win) : Command(win) {}
   void run();
 };
 

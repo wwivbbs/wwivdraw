@@ -1,9 +1,9 @@
 #ifndef FONTEDITORCOMMAND__HPP
 #define FONTEDITORCOMMAND__HPP
-#include <command.hpp>
-#include <bio_crt.h>
+#include "command.h"
+#include "bio_crt.h"
 
-class MysticDrawMain;
+class WWIVDrawMain;
 
 class FontEditorCommand : public Command {
 private:
@@ -19,7 +19,7 @@ private:
   void cursorRight();
 public:
 
-  FontEditorCommand(MysticDrawMain* win) : Command(win) {
+  FontEditorCommand(WWIVDrawMain* win) : Command(win) {
     selectMode = true;
     cursorX = 0;
     cursorY = 0;
