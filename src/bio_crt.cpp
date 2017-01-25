@@ -3,6 +3,9 @@
 bool        MouseSupport = false;
 ansout_impl ansout;
 
+static constexpr int MENU_BORDER_COLOR = 9;
+static constexpr int MENU_BORDER_COLOR_DARK = 1;
+
 int ansoutbuf::overflow(int ch)
 {
   screenEngine.putChar(ch);
@@ -448,21 +451,21 @@ void DrawBox(int x1, int y1, int x2, int y2) /* Draws a nice looking box ... */
 {
   int x, y;
   for (x = x1 + 2; x <= x2 - 2; x++) {
-    ansout << gotoxy(x, y1) << textattr(10) << (char)223;
-    ansout << gotoxy(x, y2) << textattr(2) << (char)220;
+    ansout << gotoxy(x, y1) << textattr(MENU_BORDER_COLOR) << (char)223;
+    ansout << gotoxy(x, y2) << textattr(MENU_BORDER_COLOR_DARK) << (char)220;
   }
   for (y = y1; y <= y2; y++) {
-    if ((y == y1 + 1) || (y == y2 - 1)) ansout << textattr(10); else
+    if ((y == y1 + 1) || (y == y2 - 1)) ansout << textattr(MENU_BORDER_COLOR); else
       if ((y == y1 + 2) || (y == y2 - 2)) ansout << textattr(7); else ansout << textattr(8);
     ansout << gotoxy(x1, y) << (char)221;
     ansout << gotoxy(x2, y) << (char)222;
   }
-  ansout << textattr(2);
+  ansout << textattr(MENU_BORDER_COLOR_DARK);
   ansout << gotoxy(x1, y1) << (char)220;
   ansout << gotoxy(x2, y1) << (char)220;
   ansout << gotoxy(x1, y2) << (char)223;
   ansout << gotoxy(x2, y2) << (char)223;
-  ansout << textattr(10);
+  ansout << textattr(MENU_BORDER_COLOR);
   ansout << gotoxy(x1 + 1, y1) << (char)254;
   ansout << gotoxy(x2 - 1, y1) << (char)254;
   ansout << gotoxy(x1 + 1, y2) << (char)254;

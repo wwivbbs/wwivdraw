@@ -34,6 +34,9 @@ bool Undo = false, FontTyped = false;
 unsigned char ActiveCharset = 1;
 bool FullScreen = false;
 
+static constexpr int MENU_BORDER_COLOR = 9;
+static constexpr int MENU_BACKGROUND_COLOR = 16;
+
 char* CharSet[12] = {
      "",
      "Ú¿ÀÙÄ³Ã´ÁÂ",
@@ -906,15 +909,15 @@ static int Menues(Caret& caret, int x, int y) {
     if (c != b) {
       for (a = 1; a <= MaxItem; a++) {
         ansout << gotoxy(x + 1, y + a);
-        if (b == a) ansout << textattr(32 + 15); else ansout << textattr(10);
+        if (b == a) ansout << textattr(MENU_BACKGROUND_COLOR +  15); else ansout << textattr(10);
         for (d = 1; d <= 2; d++) {
           ansout << MenueItem[a][d];
         }
-        if (b == a) ansout << textattr(32 + 15); else ansout << textattr(2);
+        if (b == a) ansout << textattr(MENU_BACKGROUND_COLOR +  15); else ansout << textattr(MENU_BORDER_COLOR);
         for (d = 3; d < Length - 6; d++) {
           ansout << MenueItem[a][d];
         }
-        if (b == a) ansout << textattr(32 + 8); else ansout << textattr(7);
+        if (b == a) ansout << textattr(MENU_BACKGROUND_COLOR +  8); else ansout << textattr(7);
         for (d = Length - 6; d <= Length; d++) {
           ansout << MenueItem[a][d];
         }
@@ -1056,23 +1059,23 @@ int menue(WWIVDrawMain& m, Caret& caret)
         ansout << gotoxy(79, 0);
         ansout << (char)223;
         ansout << gotoxy(0, 1);
-        ansout << textattr(2);
+        ansout << textattr(MENU_BORDER_COLOR);
         ansout << (char)223;
-        if (ActiveMenue == 1) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 1) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << " FILES      ";
-        if (ActiveMenue == 2) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 2) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "FONTS      ";
-        if (ActiveMenue == 3) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 3) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "OPTIONS      ";
-        if (ActiveMenue == 4) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 4) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "SCREEN      ";
-        if (ActiveMenue == 5) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 5) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "MISC.        ";
-        if (ActiveMenue == 6) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 6) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "TOGGLES    ";
-        if (ActiveMenue == 7) ansout << textattr(8 + 32); else ansout << textattr(15 + 32);
+        if (ActiveMenue == 7) ansout << textattr(8 + MENU_BACKGROUND_COLOR); else ansout << textattr(15 + MENU_BACKGROUND_COLOR);
         ansout << "HELP";
-        ansout << textattr(2);
+        ansout << textattr(MENU_BORDER_COLOR);
         ansout << (char)219 << (char)220 << (char)223;
       }
       b = ActiveMenue;
@@ -1300,7 +1303,7 @@ void WWIVDrawMain::drawStatusLine()
   if (FullScreen) {
     return;
   }
-  ansout << textattr(2) << gotoxy(0, 0);
+  ansout << textattr(MENU_BORDER_COLOR) << gotoxy(0, 0);
   for (int i = 0; i < 80; ++i) {
     ansout << ' ';
   }
@@ -1322,7 +1325,7 @@ void WWIVDrawMain::drawStatusLine()
   else {
     ansout << "   ";
   }
-  ansout << gotoxy(24, 0) << textattr(2);
+  ansout << gotoxy(24, 0) << textattr(MENU_BORDER_COLOR);
   ansout << "Page:" << currentBuffer << textattr(9);
   ansout << gotoxy(32, 0);
   ansout << "Set: " << (int)ActiveCharset;
@@ -1417,7 +1420,7 @@ void WWIVDrawMain::start(int argnum, char* args[])
   sprintf(fontLibrary, "%s%s", homeDir, relFontDir);
   cout << fontLibrary << endl;
   if (!FontLibrary::getInstance().readFontLibrary(fontLibrary)) {
-    cout << "Error loading font library see INSTALL" << endl;
+    cout << "Error loading font library [" << fontLibrary << "] see INSTALL" << endl;
   }
   free(fontLibrary);
 

@@ -131,7 +131,6 @@ public:
   Uint8& getAttributeXY(int column, int row);
 
   void putChar(unsigned char ch);
-  void setStandardPalette();
 
 
   void clearScreen()

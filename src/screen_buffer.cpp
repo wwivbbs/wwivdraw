@@ -92,23 +92,19 @@ unsigned char& ScreenBlock::getAttribute(int row, int column)
   return *(data + row * lineLength + column * 2 + 1);
 }
 
-int ScreenBlock::getHeight()
-{
+int ScreenBlock::getHeight() {
   return height;
 }
 
-int ScreenBlock::getWidth()
-{
+int ScreenBlock::getWidth() {
   return width;
 }
 
-int ScreenBlock::getLineLength()
-{
+int ScreenBlock::getLineLength() {
   return lineLength;
 }
 
-void ScreenBlock::flipY()
-{
+void ScreenBlock::flipY() {
   for (int y = 0; y < height / 2; ++y) {
     for (int x = 0; x < width; ++x) {
       swap(getCharacter(y, x), getCharacter(height - y - 1, x));
@@ -117,8 +113,7 @@ void ScreenBlock::flipY()
   }
 }
 
-void ScreenBlock::flipX()
-{
+void ScreenBlock::flipX() {
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width / 2; ++x) {
       swap(getCharacter(y, x), getCharacter(y, width - x - 1));
@@ -127,14 +122,12 @@ void ScreenBlock::flipX()
   }
 }
 
-ScreenBlock::~ScreenBlock()
-{
+ScreenBlock::~ScreenBlock() {
   delete data;
 }
 
 // SCREENBUFFER MEMBERS:
-ScreenBuffer::ScreenBuffer() : ScreenBlock(MAX_COLS, MAX_LINES)
-{
+ScreenBuffer::ScreenBuffer() : ScreenBlock(MAX_COLS, MAX_LINES) {
   saveSauce = false;
   clear();
   blinkMode = true;
@@ -143,8 +136,7 @@ ScreenBuffer::ScreenBuffer() : ScreenBlock(MAX_COLS, MAX_LINES)
   palette = 0;
 }
 
-void ScreenBuffer::insertLine(int lineNumber)
-{
+void ScreenBuffer::insertLine(int lineNumber) {
   memmove(data + (lineNumber + 1) * lineLength, data + lineNumber * lineLength, (height - lineNumber - 1) * lineLength);
   clear(0, lineNumber, width - 1, lineNumber);
 }
@@ -155,16 +147,14 @@ void ScreenBuffer::removeLine(int lineNumber)
   clear(0, height - 1, width - 1, height - 1);
 }
 
-void ScreenBuffer::insertColumn(int columnNumber)
-{
+void ScreenBuffer::insertColumn(int columnNumber) {
   for (int i = 0; i < height; ++i) {
     memmove(data + i * lineLength + (columnNumber + 1) * 2, data + i * lineLength + columnNumber * 2, (width - columnNumber - 1) * 2);
   }
   clear(columnNumber, 0, columnNumber, height - 1);
 }
 
-void ScreenBuffer::removeColumn(int columnNumber)
-{
+void ScreenBuffer::removeColumn(int columnNumber) {
   for (int i = 0; i < height; ++i) {
     memmove(data + i * lineLength + columnNumber * 2, data + i * lineLength + (columnNumber + 1) * 2, (width - columnNumber - 1) * 2);
   }
@@ -182,13 +172,11 @@ int ScreenBuffer::getLastNonEmptyLine()
   }
   return 0;
 }
-void ScreenBuffer::leftTrim()
-{
+void ScreenBuffer::leftTrim() {
   leftTrim(0, 0, width - 1, height - 1);
 }
 
-void ScreenBuffer::leftTrim(int x1, int y1, int x2, int y2)
-{
+void ScreenBuffer::leftTrim(int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     int d = 0;
     while (getCharacter(y, x1) == ' ' && d < x2 - x1) {
@@ -200,13 +188,11 @@ void ScreenBuffer::leftTrim(int x1, int y1, int x2, int y2)
   }
 }
 
-void ScreenBuffer::rightTrim()
-{
+void ScreenBuffer::rightTrim() {
   rightTrim(0, 0, width - 1, height - 1);
 }
 
-void ScreenBuffer::rightTrim(int x1, int y1, int x2, int y2)
-{
+void ScreenBuffer::rightTrim(int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     int d = 0;
     while (getCharacter(y, x2) == ' ' && d < x2 - x1) {
@@ -218,12 +204,10 @@ void ScreenBuffer::rightTrim(int x1, int y1, int x2, int y2)
   }
 }
 
-void ScreenBuffer::center()
-{
+void ScreenBuffer::center() {
   center(0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::center(int x1, int y1, int x2, int y2)
-{
+void ScreenBuffer::center(int x1, int y1, int x2, int y2) {
   leftTrim(x1, y1, x2, y2);
 
   for (int y = y1; y <= y2; ++y) {
@@ -255,12 +239,11 @@ void ScreenBuffer::transformElite(int x1, int y1, int x2, int y2)
   }
 }
 
-void ScreenBuffer::fillCharacter(unsigned char ch)
-{
+void ScreenBuffer::fillCharacter(unsigned char ch) {
   fillCharacter(ch, 0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::fillCharacter(unsigned char ch, int x1, int y1, int x2, int y2)
-{
+
+void ScreenBuffer::fillCharacter(unsigned char ch, int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     for (int x = x1; x <= x2; ++x) {
       getCharacter(y, x) = ch;
@@ -268,12 +251,11 @@ void ScreenBuffer::fillCharacter(unsigned char ch, int x1, int y1, int x2, int y
   }
 }
 
-void ScreenBuffer::fillAttribute(unsigned char attribute)
-{
+void ScreenBuffer::fillAttribute(unsigned char attribute) {
   fillAttribute(attribute, 0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::fillAttribute(unsigned char attribute, int x1, int y1, int x2, int y2)
-{
+
+void ScreenBuffer::fillAttribute(unsigned char attribute, int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     for (int x = x1; x <= x2; ++x) {
       getAttribute(y, x) = attribute;
@@ -281,12 +263,11 @@ void ScreenBuffer::fillAttribute(unsigned char attribute, int x1, int y1, int x2
   }
 }
 
-void ScreenBuffer::fillForeColor(unsigned char foreColor)
-{
+void ScreenBuffer::fillForeColor(unsigned char foreColor) {
   fillForeColor(foreColor, 0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::fillForeColor(unsigned char foreColor, int x1, int y1, int x2, int y2)
-{
+
+void ScreenBuffer::fillForeColor(unsigned char foreColor, int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     for (int x = x1; x <= x2; ++x) {
       getAttribute(y, x) = foreColor | (getAttribute(y, x) & 240);
@@ -294,12 +275,11 @@ void ScreenBuffer::fillForeColor(unsigned char foreColor, int x1, int y1, int x2
   }
 }
 
-void ScreenBuffer::fillBackColor(unsigned char backColor)
-{
+void ScreenBuffer::fillBackColor(unsigned char backColor) {
   fillBackColor(backColor, 0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::fillBackColor(unsigned char backColor, int x1, int y1, int x2, int y2)
-{
+
+void ScreenBuffer::fillBackColor(unsigned char backColor, int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     for (int x = x1; x <= x2; ++x) {
       getAttribute(y, x) = backColor | (getAttribute(y, x) & 15);
@@ -307,12 +287,11 @@ void ScreenBuffer::fillBackColor(unsigned char backColor, int x1, int y1, int x2
   }
 }
 
-void ScreenBuffer::clear()
-{
+void ScreenBuffer::clear() {
   clear(0, 0, width - 1, height - 1);
 }
-void ScreenBuffer::clear(int x1, int y1, int x2, int y2)
-{
+
+void ScreenBuffer::clear(int x1, int y1, int x2, int y2) {
   for (int y = y1; y <= y2; ++y) {
     for (int x = x1; x <= x2; ++x) {
       getCharacter(y, x) = ' ';
@@ -321,12 +300,11 @@ void ScreenBuffer::clear(int x1, int y1, int x2, int y2)
   }
 }
 
-void ScreenBuffer::drawEffect(int drawEffect, unsigned char* colorTable)
-{
+void ScreenBuffer::drawEffect(int drawEffect, unsigned char* colorTable) {
   this->drawEffect(0, 0, width - 1, height - 1, drawEffect, colorTable);
 }
-void ScreenBuffer::drawEffect(int x1, int y1, int x2, int y2, int drawEffect, unsigned char* colorTable)
-{
+
+void ScreenBuffer::drawEffect(int x1, int y1, int x2, int y2, int drawEffect, unsigned char* colorTable) {
   int Left = x1, Right = x2;
   unsigned char col = '\0';
 
@@ -422,8 +400,7 @@ ScreenBlock ScreenBuffer::getBlock(int x1, int y1, int x2, int y2)
   return newBlock;
 }
 
-void ScreenBuffer::stampBlock(ScreenBlock& block, int x1, int y1, bool stampUnder)
-{
+void ScreenBuffer::stampBlock(ScreenBlock& block, int x1, int y1, bool stampUnder) {
   int y2 = min(y1 + block.getHeight(), height);
   int x2 = min(x1 + block.getWidth(), width);
 
@@ -455,8 +432,7 @@ char ansicode[20];
 char copytmp[20];
 char code[20];
 
-char *copy(char *str, int aa, int bb)
-{
+char *copy(char *str, int aa, int bb) {
   sprintf(copytmp, "  ");
   for (int x = aa; x <= bb; ++x) {
     copytmp[x - aa] = str[x];
@@ -464,8 +440,7 @@ char *copy(char *str, int aa, int bb)
   return copytmp;
 }
 
-unsigned char ScreenBuffer::display_ansi(char ch)
-{
+unsigned char ScreenBuffer::display_ansi(char ch) {
   int b, c, retValue;
 
   if (ans_esc && ch == '[') {
@@ -745,8 +720,7 @@ unsigned char display_avatar(unsigned char ch)
   return 0;
 }
 
-typedef struct XB_Header
-{
+typedef struct XB_Header {
   unsigned char   id[4];
   unsigned char   eofChar;
   unsigned short  width;
@@ -754,8 +728,7 @@ typedef struct XB_Header
   unsigned char   fontsize;
   unsigned char   flags;
 
-  XB_Header()
-  {
+  XB_Header() {
     id[0] = 'X';
     id[1] = 'B';
     id[2] = 'I';
@@ -770,15 +743,13 @@ typedef struct XB_Header
   // Unused   Unused   Unused   512Chars   NonBlink   Compress  Font  Palette
 };
 
-ostream& operator<<(ostream& os, XB_Header& header)
-{
+ostream& operator<<(ostream& os, XB_Header& header) {
   os << "[XB_Header:eofChar=" << header.eofChar << ", width=" << header.width << ", height=" << header.height <<
     ", fontsize=" << (short)header.fontsize << ", flags=" << (short)header.flags << "]";
   return os;
 }
 
-bool ScreenBuffer::load(char *fileName)
-{
+bool ScreenBuffer::load(char *fileName) {
   FILE *fp = fopen(fileName, "rb");
   if (fp == NULL) {
     return false;
@@ -945,8 +916,7 @@ save:
 }
 
 // SAVE ROUTINES
-bool ScreenBuffer::save(char* fileName, ScreenFileFormat format)
-{
+bool ScreenBuffer::save(char* fileName, ScreenFileFormat format) {
   XB_Header header;
   FILE* fp = fopen(fileName, "wb");
   switch (format) {
